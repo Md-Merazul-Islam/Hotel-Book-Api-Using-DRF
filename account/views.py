@@ -93,6 +93,7 @@ class UserLogoutApiView(APIView):
 
 
 class DepositCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         user = request.user
         amount = Decimal(request.data.get('amount', 0.0))
