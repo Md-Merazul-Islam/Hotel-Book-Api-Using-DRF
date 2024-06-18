@@ -31,7 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-CSRF_TRUSTED_ORIGINS = ['https://library-management-system-1khz.onrender.com','https://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://blueskybooking.onrender.com','https://*.127.0.0.1']
 
 
 # Application definition
@@ -100,12 +100,21 @@ WSGI_APPLICATION = 'hotel_booking_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
+#render Database 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='postgres://blueskybooking_user:C2r3q30PO0Xvl0TYXidtbZqsgwZ46Qdk@dpg-cpol79qju9rs738qln0g-a/blueskybooking'
+    )
 }
+
 
 
 # Password validation
