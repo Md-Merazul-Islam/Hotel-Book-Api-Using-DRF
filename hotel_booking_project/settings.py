@@ -13,17 +13,13 @@ DEBUG = False
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_ORIGINS = [
-    'http://*',
-    'https://*',
-]
 
 
 CSRF_TRUSTED_ORIGINS = [
     'https://blueskybooking.onrender.com',
     'https://*.127.0.0.1',
     'http://127.0.0.1:5500',
-    'http://localhost:3000',
+
 ]
 
 
