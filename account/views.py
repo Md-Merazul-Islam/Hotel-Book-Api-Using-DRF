@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from django.utils.encoding import force_bytes
-from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer,DepositSerializer
+from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer,DepositSerializer,AllUserSerializer
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.contrib.auth import authenticate, login, logout
@@ -17,6 +17,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status
 from django.contrib.auth import get_user_model
+
+
+class AllUserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = AllUserSerializer
+
+
+
 
 class UserAccountViewSet(viewsets.ModelViewSet):
     queryset = UserAccount.objects.all()
@@ -125,7 +133,7 @@ class DepositCreateAPIView(APIView):
         except UserAccount.DoesNotExist:
             return Response({'error': 'User account not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_account.balance += amount  # Ensure 'balance' is a Decimal
+        user_account.balance += amount  
         user_account.save()
 
         # Send confirmation email
