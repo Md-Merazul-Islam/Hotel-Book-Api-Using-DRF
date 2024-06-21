@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse,get_object_or_404
 from rest_framework import viewsets
 from . models import UserAccount,Deposit
 from rest_framework.views import APIView
@@ -16,8 +16,7 @@ from django.template.loader import render_to_string
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status
-
-
+from django.contrib.auth import get_user_model
 
 class UserAccountViewSet(viewsets.ModelViewSet):
     queryset = UserAccount.objects.all()
@@ -47,19 +46,39 @@ class UserRegistrationSerializerViewSet(APIView):
         return Response(serializer.errors)
 
 
+# def activate(request, uid64, token):
+#     try:
+#         uid = urlsafe_base64_decode(uid64).decode()
+#         user = User._default_manager.get(pk=uid)
+#     except (User.DoesNotExist):
+#         user = None
+
+#     if user is not None and default_token_generator.check_token(user, token):
+#         user.is_active = True
+#         user.save()
+#         return redirect('verified_success')
+#     else:
+#         return redirect('verified_unsuccess')
+
+User = get_user_model()
+
 def activate(request, uid64, token):
     try:
         uid = urlsafe_base64_decode(uid64).decode()
-        user = User._default_manager.get(pk=uid)
-    except (User.DoesNotExist):
-        user = None
+    except (TypeError, ValueError, UnicodeDecodeError):
+        return redirect('verified_unsuccess')
 
-    if user is not None and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
-        return redirect('index.html')
+    user = get_object_or_404(User, pk=uid)
+
+    if default_token_generator.check_token(user, token):
+        if not user.is_active:  
+            user.is_active = True
+            user.save()
+        return redirect('verified_success')
     else:
-        return HttpResponse('Your account has not been verified')
+        return redirect('verified_unsuccess')
+
+
 
 
 class UserLoginApiView(APIView):
@@ -120,3 +139,15 @@ class DepositCreateAPIView(APIView):
         email.send()
 
         return Response({'message': 'Deposit successful.'}, status=status.HTTP_201_CREATED)
+    
+    
+    
+    
+    
+#add success or fail message 
+def successful(request):
+    return render(request,'successful.html')
+    
+# add unsuccessful message 
+def unsuccessful(request):
+    return render(request,'unsuccessful.html')

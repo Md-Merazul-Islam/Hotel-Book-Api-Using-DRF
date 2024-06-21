@@ -13,4 +13,6 @@ urlpatterns = [
     path('login/', views.UserLoginApiView.as_view(), name='login'),
     path('logout/', views.UserLogoutApiView.as_view(), name='logout'),
     path('deposit/',views.DepositCreateAPIView.as_view(), name='deposit-create'),
+    path('successful-email-verified/',views.successful ,name='verified_success'),
+    path('unsuccessful-email-verified/',views.unsuccessful ,name='verified_unsuccess'),
 ]
