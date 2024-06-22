@@ -6,9 +6,14 @@ from rest_framework import serializers
 from .models import Deposit
 
 class UserAccountSerializer(serializers.ModelSerializer):
+    username =  serializers.SerializerMethodField()
+
+    def get_username(self, obj):
+        return obj.user.username if obj.user else None
+
     class Meta:
         model = UserAccount
-        fields = ['id', 'user', 'account_no', 'balance']
+        fields = ['id', 'username', 'account_no', 'balance']
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
