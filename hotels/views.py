@@ -13,8 +13,8 @@ from rest_framework.response import Response
 from .models import Hotel, District, Review, Booking
 from .serializers import HotelSerializer, ReviewSerializer, DistrictSerializer, BookingSerializer
 from account.models import UserAccount
-
-
+from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 class DistrictListAPIView(generics.ListCreateAPIView):
     queryset = District.objects.all()
@@ -28,11 +28,21 @@ class DistrictDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
+class HotelFilter(filters.FilterSet):
+    district_name = filters.CharFilter(field_name='district__district_name', lookup_expr='icontains')
+    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+
+    class Meta:
+        model = Hotel
+        fields = ['district_name', 'name']
+
+
 class HotelListAPIView(generics.ListCreateAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = HotelFilter
 
 class HotelDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
