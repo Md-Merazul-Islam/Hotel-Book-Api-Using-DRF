@@ -65,13 +65,13 @@ class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class BookingListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
-    permission_classes = [permissions.IsAuthenticated]
+# class BookingListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = Booking.objects.all()
+#     serializer_class = BookingSerializer
+#     permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)
 
 
 class BookingDetailAPIView(generics.RetrieveUpdateDestroyAPIView):

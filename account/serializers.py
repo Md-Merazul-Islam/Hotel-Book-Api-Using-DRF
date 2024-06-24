@@ -46,7 +46,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.is_active = False
         user.save()
         UserAccount.objects.create(
-            user=user, balance=0, account_no=int(user.id) + 1000000)
+            user=user, balance=0, account_no=int(user.id))
         return user
 
 

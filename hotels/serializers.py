@@ -33,12 +33,18 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ['id', 'body', 'created', 'rating', 'hotel_name', 'user_name']
  
 
+
+
 class BookingSerializer(serializers.ModelSerializer):
     hotel_name = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
 
     def get_hotel_name(self, obj):
         return obj.hotel.name if obj.hotel else None
+    
+    def get_username(self, obj):
+        return obj.user.username if obj.user else None
 
     class Meta:
         model = Booking
-        fields = ['id', 'start_date', 'end_date', 'number_of_rooms', 'booked_at', 'user', 'hotel_name']
+        fields = ['id', 'start_date', 'end_date', 'number_of_rooms', 'booked_at', 'username', 'hotel_name']
