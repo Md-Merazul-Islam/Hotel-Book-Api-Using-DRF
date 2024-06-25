@@ -19,20 +19,44 @@ class HotelSerializer(serializers.ModelSerializer):
         model = Hotel
         fields = ['id','name','address','district_name','photo','address','description','price_per_night','available_room']
 
+# class ReviewSerializer(serializers.ModelSerializer):
+#     hotel_name = serializers.SerializerMethodField()
+#     user_name = serializers.SerializerMethodField()
+    
+#     def get_hotel_name (self,obj):
+#         return obj.hotel.name if obj.hotel else None
+#     def get_user_name (self,obj):
+#         return obj.user.username if obj.user else None
+    
+#     class Meta:
+#         model = Review
+#         fields = ['id', 'body', 'created', 'rating', 'hotel_name', 'user_name']
+ 
+
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     hotel_name = serializers.SerializerMethodField()
     user_name = serializers.SerializerMethodField()
-    
-    def get_hotel_name (self,obj):
+    user_profile_photo = serializers.SerializerMethodField() 
+
+    def get_hotel_name(self, obj):
         return obj.hotel.name if obj.hotel else None
-    def get_user_name (self,obj):
+
+    def get_user_name(self, obj):
         return obj.user.username if obj.user else None
-    
+
+    def get_user_profile_photo(self, obj):
+        if obj.user and hasattr(obj.user, 'account'):
+            if obj.user.account.profile_image:
+                request = self.context.get('request')
+                photo_url = obj.user.account.profile_image.url
+                return request.build_absolute_uri(photo_url) if request else photo_url
+        return None
+
     class Meta:
         model = Review
-        fields = ['id', 'body', 'created', 'rating', 'hotel_name', 'user_name']
- 
-
+        fields = ['id', 'body', 'created', 'rating', 'hotel_name', 'user_name', 'user_profile_photo']  
 
 
 class BookingSerializer(serializers.ModelSerializer):
