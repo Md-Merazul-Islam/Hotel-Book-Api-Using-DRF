@@ -213,9 +213,10 @@ def download_booking_pdf(request, booking_id):
 #     "id": 1,
 
 # {
-#     "name": "sara",
-#     "district_name": "gazipur",
+#     "user":"saim",
+#     "name": "Amari Dhaka",
 #     "start_date": "2024-06-20",
 #     "end_date": "2024-06-25",
 #     "number_of_rooms": 2
 # }
+

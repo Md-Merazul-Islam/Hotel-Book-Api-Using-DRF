@@ -13,7 +13,7 @@ class UserAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserAccount
-        fields = ['id', 'username', 'account_no', 'balance']
+        fields = ['id', 'username', 'account_no', 'balance','profile_image']
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
