@@ -50,29 +50,6 @@ class HotelDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class ReviewListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
-# class BookingListCreateAPIView(generics.ListCreateAPIView):
-#     queryset = Booking.objects.all()
-#     serializer_class = BookingSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
-
 
 class BookingDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Booking.objects.all()
@@ -206,6 +183,49 @@ def download_booking_pdf(request, booking_id):
         return HttpResponse('We had some errors <pre>' + html.escape(html_string) + '</pre>')
 
     return response
+
+
+
+
+class ReviewListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['rating']
+
+    def get_queryset(self):
+        hotel_id = self.kwargs.get('hotel_id')
+        return Review.objects.filter(hotel__id=hotel_id)
+
+    def perform_create(self, serializer):
+        hotel_id = self.kwargs.get('hotel_id')
+        hotel = generics.get_object_or_404(Hotel, pk=hotel_id)
+        serializer.save(user=self.request.user, hotel=hotel)
+
+class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_update(self, serializer):
+        if self.request.user != self.get_object().user:
+            raise permissions.PermissionDenied("You can only edit your own reviews.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if self.request.user != instance.user:
+            raise permissions.PermissionDenied("You can only delete your own reviews.")
+        instance.delete()
+
+
+
+class AllReviewsListAPIView(generics.ListAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+
 
 
 

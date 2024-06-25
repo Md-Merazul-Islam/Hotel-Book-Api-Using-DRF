@@ -27,25 +27,7 @@ class Hotel(models.Model):
     def __str__(self):
         return f'{self.name} in {self.district.district_name}'
 
-class Review(models.Model):
-    STAR_CHOICES = [
-        ('⭐', '⭐'),
-        ('⭐⭐', '⭐⭐'),
-        ('⭐⭐⭐', '⭐⭐⭐'),
-        ('⭐⭐⭐⭐', '⭐⭐⭐⭐'),
-        ('⭐⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'),
-    ]
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    body = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
-    rating = models.CharField(choices=STAR_CHOICES, max_length=10)
 
-    class Meta:
-        unique_together = ('hotel', 'user')
-
-    def __str__(self):
-        return f'Review by {self.user.username} for {self.hotel.name}'
 
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -57,3 +39,25 @@ class Booking(models.Model):
 
     def __str__(self):
         return f'Booking by {self.user.username} at {self.hotel.name} from {self.start_date} to {self.end_date}'
+
+
+
+class Review(models.Model):
+    STAR_CHOICES = [
+        ('⭐', '⭐'),
+        ('⭐⭐', '⭐⭐'),
+        ('⭐⭐⭐', '⭐⭐⭐'),
+        ('⭐⭐⭐⭐', '⭐⭐⭐⭐'),
+        ('⭐⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'),
+    ]
+    hotel = models.ForeignKey('Hotel', on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    rating = models.CharField(choices=STAR_CHOICES, max_length=10)
+
+    class Meta:
+        unique_together = ('hotel', 'user')
+
+    def __str__(self):
+        return f'Review by {self.user.username} for {self.hotel.name}'
