@@ -30,17 +30,26 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 
-class BookingSerializer(serializers.ModelSerializer):
-    hotel_name = serializers.SerializerMethodField()
-    username = serializers.SerializerMethodField()
+# class BookingSerializer(serializers.ModelSerializer):
+#     hotel_name = serializers.SerializerMethodField()
+#     username = serializers.SerializerMethodField()
 
-    def get_hotel_name(self, obj):
-        return obj.hotel.name if obj.hotel else None
+#     def get_hotel_name(self, obj):
+#         return obj.hotel.name if obj.hotel else None
     
-    def get_username(self, obj):
-        return obj.user.username if obj.user else None
+#     def get_username(self, obj):
+#         return obj.user.username if obj.user else None
 
+#     class Meta:
+#         model = Booking
+#         fields = ['id', 'start_date', 'end_date', 'number_of_rooms', 'booked_at', 'username', 'hotel_name']
+
+
+from rest_framework import serializers
+from .models import Booking
+
+class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
-        fields = ['id', 'start_date', 'end_date', 'number_of_rooms', 'booked_at', 'username', 'hotel_name']
-
+        fields = ['id', 'user', 'hotel', 'start_date', 'end_date', 'number_of_rooms', 'booked_at']
+        read_only_fields = ['id', 'user', 'booked_at']
