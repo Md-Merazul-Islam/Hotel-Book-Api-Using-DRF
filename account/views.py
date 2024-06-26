@@ -24,10 +24,27 @@ class AllUserViewSet(viewsets.ModelViewSet):
 
 
 
+    
 class UserAccountViewSet(viewsets.ModelViewSet):
-    queryset = UserAccount.objects.all()
     serializer_class = UserAccountSerializer
+    permission_classes = [IsAuthenticated]  
 
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+ 
+            return UserAccount.objects.filter(user=self.request.user)
+        else:
+            return UserAccount.objects.none()  
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+    
+    
+    
 class UserRegistrationSerializerViewSet(APIView):
     serializer_class = UserRegistrationSerializer
     def post(self, request):
