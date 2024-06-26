@@ -27,20 +27,9 @@ class AllUserViewSet(viewsets.ModelViewSet):
     
 class UserAccountViewSet(viewsets.ModelViewSet):
     serializer_class = UserAccountSerializer
-    permission_classes = [IsAuthenticated]  
-
-    def get_queryset(self):
-        if self.request.user.is_authenticated:
- 
-            return UserAccount.objects.filter(user=self.request.user)
-        else:
-            return UserAccount.objects.none()  
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
+    queryset = UserAccount.objects.all()
+  
+    
 
     
     
@@ -102,9 +91,10 @@ class UserLoginApiView(APIView):
             user = authenticate(username=username, password=password)
 
             if user:
+                login(request, user)
                 token, _ = Token.objects.get_or_create(user=user)
                 print(token, _)
-                login(request, user)
+                # login(request, user)
                 return Response({'token': token.key, 'user_id': user.id})
             else:
                 return Response({'error': 'Invalid Credentials'})
