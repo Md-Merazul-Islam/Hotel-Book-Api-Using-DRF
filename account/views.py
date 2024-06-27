@@ -124,22 +124,25 @@ class DepositApiView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user
-        amount = serializer.validated_data.get('amount', Decimal('0.00'))
+        amount = serializer.validated_data.get('amount', 0)
+
         if amount < 500:
-            raise serializers.ValidationError(
-                {'amount': 'Minimum deposit is 500 tk.'})
+            raise serializers.ValidationError({'amount': 'Minimum deposit amount is 500.'})
 
         try:
-            user_account = user.account
+            # Assuming UserAccount model is related to User through a OneToOneField
+            user_account = user.useraccount  # Adjust as per your actual model structure
             user_account.balance += amount
             user_account.save()
             serializer.save(user=user)
+
+            # Sending confirmation email
             self.send_confirmation_email(user, amount)
+
             return Response({'message': 'Deposit successful.'}, status=status.HTTP_201_CREATED)
 
-        except UserAccount.DoesNotExist:
-            raise serializers.ValidationError(
-                {'user': 'User account not found.'})
+        except User.useraccount.RelatedObjectDoesNotExist:
+            raise serializers.ValidationError({'user': 'User account not found.'})
 
     def send_confirmation_email(self, user, amount):
         email_subject = "Deposit Confirmation"
@@ -153,3 +156,24 @@ class DepositApiView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Deposit.objects.filter(user=self.request.user)
+
+# --------------------
+from django.shortcuts import render
+from rest_framework.views import APIView
+from . serializers import TransactionSerializer
+from rest_framework.response import Response
+
+
+class TransactionAPIView(APIView):
+    def post(self, request):
+        serializer = TransactionSerializer(data=request.data)
+        if serializer.is_valid():
+            transaction = serializer.save()
+            response_data = {
+                'message' : 'Deposit successful',
+                'transaction_id' : transaction.id
+            }
+            
+            return Response(response_data)
+        else:
+            return Response(serializer.errors)
