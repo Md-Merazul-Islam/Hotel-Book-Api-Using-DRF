@@ -5,8 +5,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from .models import Deposit
-
-
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth.tokens import default_token_generator
+from django.template.loader import render_to_string
 class UserAccountSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
 
@@ -94,40 +96,106 @@ class AllUserSerializer(serializers.ModelSerializer):
 
 
 
+# class TransactionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Transaction
+#         fields = ['account', 'amount']
+#         read_only_fields = ['balance_after_transaction', 'transaction_type']
+#     def validate_account(self, value):
+#         try:
+#             account = UserAccount.objects.get(id=value.id)
+#         except UserAccount.DoesNotExist:
+#             raise serializers.ValidationError(
+#                 {'error': 'Account does not exist'})
+#         return account
+
+#     def validate_amount(self, value):
+#         min_deposit_amount = 100
+
+#         if value > min_deposit_amount:
+#             return value
+#         else:
+#             raise serializers.ValidationError(
+#                 f'Minimum deposit amount is {min_deposit_amount}')
+#         return value
+
+#     def create(self, validated_data):
+#         account = validated_data['account']
+#         amount = validated_data['amount']
+#         user = self.request.user
+
+#         current_balance = account.balance
+#         new_balance = current_balance + amount
+
+#         account.balance = new_balance
+#         validated_data['transaction_type'] = 'Deposit'
+#         account.save()
+#         self.send_confirmation_email(user, amount)
+#         transaction = Transaction.objects.create(
+#             account=account, amount=amount, balance_after_transaction=new_balance)
+#         print(transaction)
+#         return transaction
+    
+#     def send_confirmation_email(self, user, amount):
+#         email_subject = "Deposit Confirmation"
+#         email_body = render_to_string('deposit_confirm_email.html', {
+#             'user': user.username,
+#             'amount': amount,
+#         })
+#         email = EmailMultiAlternatives(email_subject, '', to=[user.email])
+#         email.attach_alternative(email_body, "text/html")
+#         email.send()
+
+
+
+
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ['account', 'amount']
         read_only_fields = ['balance_after_transaction', 'transaction_type']
+
     def validate_account(self, value):
         try:
             account = UserAccount.objects.get(id=value.id)
         except UserAccount.DoesNotExist:
-            raise serializers.ValidationError(
-                {'error': 'Account does not exist'})
+            raise serializers.ValidationError('Account does not exist')
         return account
 
     def validate_amount(self, value):
         min_deposit_amount = 100
-
-        if value > min_deposit_amount:
+        if value >= min_deposit_amount:
             return value
         else:
-            raise serializers.ValidationError(
-                f'Minimum deposit amount is {min_deposit_amount}')
-        return value
-
+            raise serializers.ValidationError(f'Minimum deposit amount is {min_deposit_amount}')
+    
     def create(self, validated_data):
         account = validated_data['account']
         amount = validated_data['amount']
+        user = self.context['request'].user  # Accessing user from request context
 
         current_balance = account.balance
         new_balance = current_balance + amount
 
         account.balance = new_balance
-        validated_data['transaction_type'] = 'Deposit'
         account.save()
+
         transaction = Transaction.objects.create(
-            account=account, amount=amount, balance_after_transaction=new_balance)
-        print(transaction)
+            account=account,
+            amount=amount,
+            balance_after_transaction=new_balance,
+            transaction_type='Deposit'
+        )
+
+        self.send_confirmation_email(user, amount)
         return transaction
+    
+    def send_confirmation_email(self, user, amount):
+        email_subject = "Deposit Confirmation"
+        email_body = render_to_string('deposit_confirm_email.html', {
+            'user': user.username,
+            'amount': amount,
+        })
+        email = EmailMultiAlternatives(email_subject, '', to=[user.email])
+        email.attach_alternative(email_body, "text/html")
+        email.send()
