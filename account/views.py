@@ -120,7 +120,7 @@ def unsuccessful(request):
 class DepositApiView(generics.ListCreateAPIView):
     queryset = Deposit.objects.all()
     serializer_class = DepositSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated] # check 
 
     def perform_create(self, serializer):
         user = self.request.user
