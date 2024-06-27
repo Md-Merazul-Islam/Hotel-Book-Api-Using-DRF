@@ -13,6 +13,17 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ORIGIN_ALLOW_ALL = False
+
+
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:5500',
+    'https://*.127.0.0.1',
+    'https://blueskybooking.onrender.com',
+]
+
+
 
 
 CSRF_TRUSTED_ORIGINS = [
@@ -21,7 +32,6 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:5500',
 
 ]
-
 
 
 CORS_ALLOW_HEADERS = [
