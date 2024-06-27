@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . models import UserAccount
+from . models import UserAccount,Deposit
 # Register your models here.
 class UserAccountAdmin(admin.ModelAdmin):
     list_display = ["account_no", "first_name", "last_name", "balance"]
@@ -11,3 +11,4 @@ class UserAccountAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserAccount, UserAccountAdmin)
+admin.site.register(Deposit)

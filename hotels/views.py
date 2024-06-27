@@ -23,7 +23,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 import json
 
 
-
 class DistrictListAPIView(generics.ListCreateAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
@@ -64,92 +63,6 @@ class BookingDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-# class BookingHotelView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def post(self, request):
-#         user = request.user
-#         hotel_name = request.data.get('name')
-#         district_name = request.data.get('district_name')
-#         start_date = request.data.get('start_date')
-#         end_date = request.data.get('end_date')
-#         number_of_rooms = int(request.data.get('number_of_rooms', 1))
-
-#         try:
-#             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-#             end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-#             if start_date >= end_date:
-#                 return Response({'error': 'End date must be after start date.'}, status=status.HTTP_400_BAD_REQUEST)
-#         except ValueError:
-#             return Response({'error': 'Invalid date format.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         hotel = Hotel.objects.filter(
-#             name=hotel_name, district__district_name=district_name).first()
-
-#         if not hotel:
-#             return Response({'error': 'Hotel not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-#         existing_booking = Booking.objects.filter(
-#             user=user,
-#             hotel=hotel,
-#             start_date=start_date,
-#             end_date=end_date,
-#             number_of_rooms=number_of_rooms
-#         ).exists()
-
-#         if existing_booking:
-#             return Response({'error': 'You have already booked this hotel for these dates and number of rooms.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         days = (end_date - start_date).days
-#         total_cost = hotel.price_per_night * days * number_of_rooms
-
-#         if hotel.available_room < number_of_rooms:
-#             return Response({'error': 'Not enough rooms available.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         try:
-#             user_account = user.account
-#         except UserAccount.DoesNotExist:
-#             return Response({'error': 'User account not found.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         if user_account.balance < total_cost:
-#             return Response({'error': 'Insufficient funds in balance.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         booking_data = {
-#             'user': user.id,
-#             'hotel': hotel.id,
-#             'start_date': start_date,
-#             'end_date': end_date,
-#             'number_of_rooms': number_of_rooms,
-#         }
-
-#         serializer = BookingSerializer(data=booking_data)
-
-#         if serializer.is_valid():
-#             booking = serializer.save()
-#             user_account.balance -= total_cost
-#             user_account.save()
-
-#             # Deduct the booked rooms from available rooms
-#             hotel.available_room -= number_of_rooms * days
-#             hotel.save()
-
-#             # Send booking confirmation email
-#             email_subject = "Booking Confirmation"
-#             email_body = render_to_string('book_confirm_email.html', {
-#                 'hotel_name': hotel.name,
-#                 'start_date': start_date,
-#                 'end_date': end_date,
-#                 'total_cost': total_cost,
-#                 'pdf_link': request.build_absolute_uri(reverse('download_booking_pdf', args=[booking.id]))
-#             })
-#             email = EmailMultiAlternatives(email_subject, '', to=[user.email])
-#             email.attach_alternative(email_body, "text/html")
-#             email.send()
-
-#             return Response({'message': 'Booking confirmed. Check your email for details.'}, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def download_booking_pdf(request, booking_id):
@@ -230,9 +143,6 @@ class AllReviewsListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-
-
-
 class BookingHotelView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -242,7 +152,7 @@ class BookingHotelView(APIView):
             hotel_id = data.get('hotel_id')
             start_date = data.get('start_date')
             end_date = data.get('end_date')
-            number_of_rooms = int(data.get('number_of_rooms', 1))   
+            number_of_rooms = int(data.get('number_of_rooms', 1))
         except json.JSONDecodeError:
             return Response({'error': 'Invalid JSON format.'}, status=status.HTTP_400_BAD_REQUEST)
 

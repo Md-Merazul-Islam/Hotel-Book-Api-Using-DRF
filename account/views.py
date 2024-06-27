@@ -1,21 +1,23 @@
+from rest_framework import serializers
 from decimal import Decimal
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect,get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
-from . models import UserAccount
+from . models import UserAccount, Deposit
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.encoding import force_bytes
-from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer,AllUserSerializer
+from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer, AllUserSerializer, DepositSerializer
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import  EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate, login, logout
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import  status
+from rest_framework import status
 from django.contrib.auth import get_user_model
+from rest_framework import generics
 
 
 class AllUserViewSet(viewsets.ModelViewSet):
@@ -23,19 +25,14 @@ class AllUserViewSet(viewsets.ModelViewSet):
     serializer_class = AllUserSerializer
 
 
-
-    
 class UserAccountViewSet(viewsets.ModelViewSet):
     serializer_class = UserAccountSerializer
     queryset = UserAccount.objects.all()
-  
-    
 
-    
-    
-    
+
 class UserRegistrationSerializerViewSet(APIView):
     serializer_class = UserRegistrationSerializer
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -58,8 +55,8 @@ class UserRegistrationSerializerViewSet(APIView):
         return Response(serializer.errors)
 
 
-
 User = get_user_model()
+
 
 def activate(request, uid64, token):
     try:
@@ -70,14 +67,12 @@ def activate(request, uid64, token):
     user = get_object_or_404(User, pk=uid)
 
     if default_token_generator.check_token(user, token):
-        if not user.is_active:  
+        if not user.is_active:
             user.is_active = True
             user.save()
         return redirect('verified_success')
     else:
         return redirect('verified_unsuccess')
-
-
 
 
 class UserLoginApiView(APIView):
@@ -111,24 +106,42 @@ class UserLogoutApiView(APIView):
         return redirect('login')
 
 
-class DepositCreateAPIView(APIView):
+# add success or fail message
+def successful(request):
+    return render(request, 'successful.html')
+
+# add unsuccessful message
+
+
+def unsuccessful(request):
+    return render(request, 'unsuccessful.html')
+
+
+class DepositApiView(generics.ListCreateAPIView):
+    queryset = Deposit.objects.all()
+    serializer_class = DepositSerializer
     permission_classes = [IsAuthenticated]
-    def post(self, request):
-        user = request.user
-        amount = Decimal(request.data.get('amount', 0.0))
-        if amount <500:
-             return Response({'error': 'Minimum you need deposit 500 tk.'}, status=status.HTTP_400_BAD_REQUEST)
-            
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        amount = serializer.validated_data.get('amount', Decimal('0.00'))
+        if amount < 500:
+            raise serializers.ValidationError(
+                {'amount': 'Minimum deposit is 500 tk.'})
 
         try:
             user_account = user.account
+            user_account.balance += amount
+            user_account.save()
+            serializer.save(user=user)
+            self.send_confirmation_email(user, amount)
+            return Response({'message': 'Deposit successful.'}, status=status.HTTP_201_CREATED)
+
         except UserAccount.DoesNotExist:
-            return Response({'error': 'User account not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            raise serializers.ValidationError(
+                {'user': 'User account not found.'})
 
-        user_account.balance += amount  
-        user_account.save()
-
-        # Send confirmation email
+    def send_confirmation_email(self, user, amount):
         email_subject = "Deposit Confirmation"
         email_body = render_to_string('deposit_confirm_email.html', {
             'user': user.username,
@@ -138,16 +151,5 @@ class DepositCreateAPIView(APIView):
         email.attach_alternative(email_body, "text/html")
         email.send()
 
-        return Response({'message': 'Deposit successful.'}, status=status.HTTP_201_CREATED)
-    
-    
-    
-    
-    
-#add success or fail message 
-def successful(request):
-    return render(request,'successful.html')
-    
-# add unsuccessful message 
-def unsuccessful(request):
-    return render(request,'unsuccessful.html')
+    def get_queryset(self):
+        return Deposit.objects.filter(user=self.request.user)

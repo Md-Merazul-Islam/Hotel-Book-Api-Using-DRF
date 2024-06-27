@@ -5,15 +5,16 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from .models import Deposit
 
+
 class UserAccountSerializer(serializers.ModelSerializer):
-    username =  serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
 
     def get_username(self, obj):
         return obj.user.username if obj.user else None
 
     class Meta:
         model = UserAccount
-        fields = ['id', 'username', 'account_no', 'balance','profile_image']
+        fields = ['id', 'username', 'account_no', 'balance', 'profile_image']
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -58,8 +59,8 @@ class UserLoginSerializer(serializers.Serializer):
 class DepositSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deposit
-        fields = ['id', 'user', 'amount', 'timestamp']
-        
+        fields = '__all__'
+
 
 class AllUserSerializer(serializers.ModelSerializer):
     class Meta:
