@@ -33,5 +33,4 @@ class ReviewSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
-        fields = ['id', 'user', 'hotel', 'start_date', 'end_date', 'number_of_rooms', 'booked_at']
-        read_only_fields = ['id', 'user', 'booked_at']
+        fields ='__all__'
