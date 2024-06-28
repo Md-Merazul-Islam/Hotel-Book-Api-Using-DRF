@@ -399,7 +399,7 @@ from .serializers import BookingSerializer
 from django.db import transaction
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def book_hotel(request):
     user = request.user
     try:
