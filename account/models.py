@@ -57,7 +57,6 @@ TRANSACTION_TYPE = [
         ("Pay", "Pay"),
     ]
 class Transaction(models.Model):
-    
     account = models.ForeignKey(UserAccount, related_name='transactions', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     balance_after_transaction = models.DecimalField(max_digits=12, decimal_places=2)

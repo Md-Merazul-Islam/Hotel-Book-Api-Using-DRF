@@ -1,9 +1,9 @@
-from rest_framework import serializers
+
 from decimal import Decimal
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
-from . models import UserAccount, Deposit
+from . models import UserAccount
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.encoding import force_bytes
@@ -15,9 +15,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
 from django.contrib.auth import get_user_model
-from rest_framework import generics
+
+
+
 
 
 class AllUserViewSet(viewsets.ModelViewSet):
@@ -117,56 +118,10 @@ def unsuccessful(request):
     return render(request, 'unsuccessful.html')
 
 
-class DepositApiView(generics.ListCreateAPIView):
-    queryset = Deposit.objects.all()
-    serializer_class = DepositSerializer
-    permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        user = self.request.user
-        amount = serializer.validated_data.get('amount', 0)
-
-        if amount < 500:
-            raise serializers.ValidationError({'amount': 'Minimum deposit amount is 500.'})
-
-        try:
-            # Assuming UserAccount model is related to User through a OneToOneField
-            user_account = user.useraccount  # Adjust as per your actual model structure
-            user_account.balance += amount
-            user_account.save()
-            serializer.save(user=user)
-
-            # Sending confirmation email
-            self.send_confirmation_email(user, amount)
-
-            return Response({'message': 'Deposit successful.'}, status=status.HTTP_201_CREATED)
-
-        except User.useraccount.RelatedObjectDoesNotExist:
-            raise serializers.ValidationError({'user': 'User account not found.'})
-
-    def send_confirmation_email(self, user, amount):
-        email_subject = "Deposit Confirmation"
-        email_body = render_to_string('deposit_confirm_email.html', {
-            'user': user.username,
-            'amount': amount,
-        })
-        email = EmailMultiAlternatives(email_subject, '', to=[user.email])
-        email.attach_alternative(email_body, "text/html")
-        email.send()
-
-    def get_queryset(self):
-        return Deposit.objects.filter(user=self.request.user)
-
-# --------------------
-from django.shortcuts import render
-from rest_framework.views import APIView
-from . serializers import TransactionSerializer
-from rest_framework.response import Response
-
-
-class TransactionAPIView(APIView):
+class DepositViewSet(APIView):
     def post(self, request):
-        serializer = TransactionSerializer(data=request.data)
+        serializer = DepositSerializer(data=request.data)
         if serializer.is_valid():
             transaction = serializer.save()
             response_data = {
