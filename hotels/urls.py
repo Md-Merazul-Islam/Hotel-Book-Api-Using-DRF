@@ -23,3 +23,14 @@ urlpatterns = [
     path('book/', views.BookHotelView.as_view(), name='book_hotel'),
     
 ]
+
+
+
+
+
+# {
+#   "hotel": 1,
+#   "start_date": "2024-07-01",
+#   "end_date": "2024-07-05",
+#   "number_of_rooms": 2
+# }
