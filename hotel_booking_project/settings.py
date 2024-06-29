@@ -18,34 +18,21 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 
 
-# CORS_ALLOWED_ORIGINS = [
-#     'http://127.0.0.1:5500',
-#     'https://*.127.0.0.1',
-#     'https://blueskybooking.onrender.com',
-# ]
-
-
-
-
-# CSRF_TRUSTED_ORIGINS = [
-#     'https://blueskybooking.onrender.com',
-#     'https://*.127.0.0.1',
-#     'http://127.0.0.1:5500',
-
-# ]
-
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5500',
-    'https://blueskybooking.onrender.com',
     'https://*.127.0.0.1',
+    'https://blueskybooking.onrender.com',
 ]
+
+
+
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:5500',
     'https://blueskybooking.onrender.com',
     'https://*.127.0.0.1',
-]
+    'http://127.0.0.1:5500',
 
+]
 
 
 CORS_ALLOW_HEADERS = [
