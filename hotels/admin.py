@@ -25,3 +25,4 @@ class BookingAdmin(admin.ModelAdmin):
     list_display = ('hotel', 'user', 'start_date', 'end_date', 'number_of_rooms', 'booked_at')
     list_filter = ('start_date', 'end_date', 'booked_at')
     search_fields = ('hotel__name', 'user__username')
+

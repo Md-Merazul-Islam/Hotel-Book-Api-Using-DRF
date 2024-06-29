@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 
 class District(models.Model):
-    district_name = models.CharField(max_length=100)  
+    district_name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=200, unique=True, blank=True, null=True)
 
     def __str__(self):
@@ -27,8 +27,6 @@ class Hotel(models.Model):
     def __str__(self):
         return f'{self.name} in {self.district.district_name}'
 
-
-
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
@@ -40,8 +38,6 @@ class Booking(models.Model):
     def __str__(self):
         return f'Booking by {self.user.username} at {self.hotel.name} from {self.start_date} to {self.end_date}'
 
-
-
 class Review(models.Model):
     STAR_CHOICES = [
         ('⭐', '⭐'),
@@ -50,7 +46,7 @@ class Review(models.Model):
         ('⭐⭐⭐⭐', '⭐⭐⭐⭐'),
         ('⭐⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'),
     ]
-    hotel = models.ForeignKey('Hotel', on_delete=models.CASCADE, related_name='reviews')
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
@@ -61,19 +57,3 @@ class Review(models.Model):
 
     def __str__(self):
         return f'Review by {self.user.username} for {self.hotel.name}'
-
-
-
-
-
-
-
-
-
-
-
-
-# ---------------------------------------------------
-
-
-
