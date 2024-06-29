@@ -125,19 +125,16 @@ from .models import Booking
 
 
 
-
-
-
-
-
-
-
 from rest_framework import serializers
 from django.db import transaction
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
 from .models import Booking, Hotel
+from django.shortcuts import get_object_or_404
+import logging
+
+logger = logging.getLogger(__name__)
 
 class BookingSerializer(serializers.Serializer):
     hotel_id = serializers.IntegerField()
@@ -151,71 +148,65 @@ class BookingSerializer(serializers.Serializer):
         end_date = data.get('end_date')
         number_of_rooms = data.get('number_of_rooms')
 
-        # Check if hotel exists
         try:
             hotel = Hotel.objects.get(id=hotel_id)
         except Hotel.DoesNotExist:
             raise serializers.ValidationError({'error': 'Hotel does not exist'})
 
-        # Check if user has an account
         user_account = self.context['request'].user.account
 
-        # Calculate total cost
         total_days = (end_date - start_date).days
         total_cost = hotel.price_per_night * number_of_rooms * total_days
 
-        # Check if user has sufficient balance
         if user_account.balance < total_cost:
             raise serializers.ValidationError({'error': 'Insufficient balance'})
 
-        # Check if hotel has enough available rooms
         if hotel.available_room < number_of_rooms:
             raise serializers.ValidationError({'error': 'Not enough rooms available'})
 
         data['hotel'] = hotel
         data['user_account'] = user_account
         data['total_cost'] = total_cost
-        
         return data
 
-    def save(self):
-        validated_data = self.validated_data
-        hotel = validated_data['hotel']
-        user_account = validated_data['user_account']
-        total_cost = validated_data['total_cost']
-        number_of_rooms = validated_data['number_of_rooms']
-        start_date = validated_data['start_date']
-        end_date = validated_data['end_date']
+    def create(self, validated_data):
+        try:
+            user = self.context['request'].user
+            hotel = validated_data['hotel']
+            user_account = validated_data['user_account']
+            total_cost = validated_data['total_cost']
+            number_of_rooms = validated_data['number_of_rooms']
+            start_date = validated_data['start_date']
+            end_date = validated_data['end_date']
 
-        with transaction.atomic():
-            # Update user's balance
-            user_account.balance -= total_cost
-            user_account.save(update_fields=['balance'])
+            with transaction.atomic():
+                user_account.balance -= total_cost
+                user_account.save(update_fields=['balance'])
 
-            # Update hotel's available rooms
-            hotel.available_room -= number_of_rooms
-            hotel.save(update_fields=['available_room'])
+                hotel.available_room -= number_of_rooms
+                hotel.save(update_fields=['available_room'])
 
-            # Create booking
-            booking = Booking.objects.create(
-                user=user_account.user,
-                hotel=hotel,
-                start_date=start_date,
-                end_date=end_date,
-                number_of_rooms=number_of_rooms
-            )
+                booking = Booking.objects.create(
+                    user=user,
+                    hotel=hotel,
+                    start_date=start_date,
+                    end_date=end_date,
+                    number_of_rooms=number_of_rooms
+                )
 
-            # Send booking confirmation email
-            email_subject = "Booking Confirmation"
-            email_body = render_to_string('book_confirm_email.html', {
-                'hotel_name': hotel.name,
-                'start_date': start_date,
-                'end_date': end_date,
-                'total_cost': total_cost,
-                'pdf_link': self.context['request'].build_absolute_uri(reverse('download_booking_pdf', args=[booking.id]))
-            })
-            email = EmailMultiAlternatives(email_subject, '', to=[user_account.user.email])
-            email.attach_alternative(email_body, "text/html")
-            email.send()
+                email_subject = "Booking Confirmation"
+                email_body = render_to_string('book_confirm_email.html', {
+                    'hotel_name': hotel.name,
+                    'start_date': start_date,
+                    'end_date': end_date,
+                    'total_cost': total_cost,
+                    'pdf_link': self.context['request'].build_absolute_uri(reverse('download_booking_pdf', args=[booking.id]))
+                })
+                email = EmailMultiAlternatives(email_subject, '', to=[user.email])
+                email.attach_alternative(email_body, "text/html")
+                email.send()
 
-        return booking
+            return booking
+        except Exception as e:
+            logger.error(f"Error creating booking: {str(e)}")
+            raise serializers.ValidationError({'error': 'Failed to create booking.'})

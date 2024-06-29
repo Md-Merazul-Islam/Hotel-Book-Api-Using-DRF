@@ -472,14 +472,29 @@ class AllReviewsListAPIView(generics.ListAPIView):
 #             except Exception as e:
 #                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
+from .models import Booking, Hotel
+from .serializers import BookingSerializer
+import logging
 
+logger = logging.getLogger(__name__)
 
 class BookHotelView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializer = BookingSerializer(data=request.data)
+        serializer = BookingSerializer(data=request.data, context={'request': request})  # Pass request to serializer context
+
         if serializer.is_valid():
-            booking = serializer.save()
-            return Response({'message': 'You have successfully book the hotel  '})
-        return Response(serializer.errors)
+            try:
+                booking = serializer.save()
+                return Response({'message': 'You have successfully booked the hotel.'}, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.error(f"Error saving booking: {str(e)}")
+                return Response({'error': 'Failed to book hotel.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
