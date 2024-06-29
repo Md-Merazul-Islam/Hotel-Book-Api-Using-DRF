@@ -147,7 +147,7 @@ class AllReviewsListAPIView(generics.ListAPIView):
 
 
 class BookHotelView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = BookingSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
