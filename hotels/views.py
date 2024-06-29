@@ -462,64 +462,56 @@ class AllReviewsListAPIView(generics.ListAPIView):
 
 
 
-
-
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
 from .models import Booking, Hotel
 from .serializers import BookingSerializer
-from django.db import transaction
+from django.shortcuts import get_object_or_404
 
-@api_view(['GET'])
-def list_hotels(request):
-    hotels = Hotel.objects.all()
-    serializer = HotelSerializer(hotels, many=True)
-    return Response(serializer.data)
+class BookHotelView(APIView):
+    permission_classes = [IsAuthenticated]
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def book_hotel(request):
-    user = request.user
+    def post(self, request, *args, **kwargs):
+        user = request.user
 
-    try:
-        user_account = user.account
-    except UserAccount.DoesNotExist:
-        return Response({'error': 'User account not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    serializer = BookingSerializer(data=request.data)
-    if serializer.is_valid():
         try:
-            hotel_id = serializer.validated_data['hotel'].id
-            number_of_rooms = serializer.validated_data['number_of_rooms']
-            start_date = serializer.validated_data['start_date']
-            end_date = serializer.validated_data['end_date']
+            user_account = user.account
+        except UserAccount.DoesNotExist:
+            return Response({'error': 'User account not found'}, status=status.HTTP_404_NOT_FOUND)
 
-            hotel = Hotel.objects.get(id=hotel_id)
-            
-            total_days = (end_date - start_date).days
-            total_cost = hotel.price_per_night * number_of_rooms * total_days
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                hotel_id = serializer.validated_data['hotel'].id
+                number_of_rooms = serializer.validated_data['number_of_rooms']
+                start_date = serializer.validated_data['start_date']
+                end_date = serializer.validated_data['end_date']
 
-            if user_account.balance < total_cost:
-                return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
+                hotel = get_object_or_404(Hotel, id=hotel_id)
 
-            if hotel.available_room < number_of_rooms:
-                return Response({'error': 'Not enough rooms available'}, status=status.HTTP_400_BAD_REQUEST)
+                total_days = (end_date - start_date).days
+                total_cost = hotel.price_per_night * number_of_rooms * total_days
 
-            with transaction.atomic():
-                user_account.balance -= total_cost
-                user_account.save()
+                if user_account.balance < total_cost:
+                    return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
 
-                hotel.available_room -= number_of_rooms
-                hotel.save()
+                if hotel.available_room < number_of_rooms:
+                    return Response({'error': 'Not enough rooms available'}, status=status.HTTP_400_BAD_REQUEST)
 
-                booking = serializer.save(user=user)
-                return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+                with transaction.atomic():
+                    user_account.balance -= total_cost
+                    user_account.save()
 
-        except Hotel.DoesNotExist:
-            return Response({'error': 'Hotel not found'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    hotel.available_room -= number_of_rooms
+                    hotel.save()
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    booking = serializer.save(user=user)
+                    return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
