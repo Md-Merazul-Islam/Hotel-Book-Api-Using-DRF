@@ -29,8 +29,8 @@ urlpatterns = [
 
 
 # {
-#   "hotel": 1,
+#   "hotel": 4,
 #   "start_date": "2024-07-01",
-#   "end_date": "2024-07-05",
-#   "number_of_rooms": 2
+#   "end_date": "2024-07-03",
+#   "number_of_rooms": 1
 # }

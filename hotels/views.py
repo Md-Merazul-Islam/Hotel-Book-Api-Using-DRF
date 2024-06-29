@@ -461,57 +461,60 @@ class AllReviewsListAPIView(generics.ListAPIView):
 # -------------------------------
 
 
+# views.py
+
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework.permissions import IsAuthenticated
+# from django.shortcuts import get_object_or_404
+# from django.db import transaction
+# from rest_framework import status
+# from .models import Booking, Hotel
+# from .serializers import BookingSerializer
+# from account.models import UserAccount  
+
+
+# class BookHotelView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = BookingSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data, context={'request': request})
+#         if serializer.is_valid():
+#             try:
+#                 booking = serializer.save(user=request.user)
+#                 return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+#             except serializers.ValidationError as e:
+#                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+#             except Exception as e:
+#                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
+
 
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.db import transaction
-from .models import Booking, Hotel
 from .serializers import BookingSerializer
-from django.shortcuts import get_object_or_404
 
 class BookHotelView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        user = request.user
+        serializer = BookingSerializer(data=request.data, context={'request': request})
 
-        try:
-            user_account = user.account
-        except UserAccount.DoesNotExist:
-            return Response({'error': 'User account not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = BookingSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                hotel_id = serializer.validated_data['hotel'].id
-                number_of_rooms = serializer.validated_data['number_of_rooms']
-                start_date = serializer.validated_data['start_date']
-                end_date = serializer.validated_data['end_date']
-
-                hotel = get_object_or_404(Hotel, id=hotel_id)
-
-                total_days = (end_date - start_date).days
-                total_cost = hotel.price_per_night * number_of_rooms * total_days
-
-                if user_account.balance < total_cost:
-                    return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
-
-                if hotel.available_room < number_of_rooms:
-                    return Response({'error': 'Not enough rooms available'}, status=status.HTTP_400_BAD_REQUEST)
-
-                with transaction.atomic():
-                    user_account.balance -= total_cost
-                    user_account.save()
-
-                    hotel.available_room -= number_of_rooms
-                    hotel.save()
-
-                    booking = serializer.save(user=user)
-                    return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
-
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            booking = serializer.save()
+            return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
