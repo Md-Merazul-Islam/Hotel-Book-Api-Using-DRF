@@ -390,70 +390,136 @@ class AllReviewsListAPIView(generics.ListAPIView):
 #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# from rest_framework import status
+# from rest_framework.decorators import api_view, permission_classes
+# from rest_framework.permissions import IsAuthenticated
+# from rest_framework.response import Response
+# # from .models import Booking, Hotel, UserAccount
+# from .serializers import BookingSerializer
+# from django.db import transaction
+
+# @api_view(['POST'])
+# # @permission_classes([IsAuthenticated])
+# def book_hotel(request):
+#     user = request.user
+#     try:
+#         user_account = user.account
+#     except UserAccount.DoesNotExist:
+#         return Response({'error': 'User account not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+#     serializer = BookingSerializer(data=request.data)
+#     if serializer.is_valid():
+#         hotel_id = serializer.validated_data['hotel'].id
+#         number_of_rooms = serializer.validated_data['number_of_rooms']
+#         start_date = serializer.validated_data['start_date']
+#         end_date = serializer.validated_data['end_date']
+
+#         try:
+#             hotel = Hotel.objects.get(id=hotel_id)
+#         except Hotel.DoesNotExist:
+#             return Response({'error': 'Hotel not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         total_days = (end_date - start_date).days
+#         total_cost = hotel.price_per_night * number_of_rooms * total_days
+
+#         if user_account.balance < total_cost:
+#             return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         if hotel.available_room < number_of_rooms:
+#             return Response({'error': 'Not enough rooms available'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Use a transaction to ensure atomicity
+#         with transaction.atomic():
+#             # Deduct balance
+#             user_account.balance -= total_cost
+#             user_account.save()
+
+#             # Decrease available rooms
+#             hotel.available_room -= number_of_rooms
+#             hotel.save()
+
+#             # Save the booking
+#             booking = serializer.save(user=user)
+#              # Send booking confirmation email
+#             email_subject = "Booking Confirmation"
+#             email_body = render_to_string('book_confirm_email.html', {
+#                 'hotel_name': hotel.name,
+#                 'start_date': start_date,
+#                 'end_date': end_date,
+#                 'total_cost': total_cost,
+#                 'pdf_link': request.build_absolute_uri(reverse('download_booking_pdf', args=[booking.id]))
+#             })
+#             email = EmailMultiAlternatives(email_subject, '', to=[user.email])
+#             email.attach_alternative(email_body, "text/html")
+#             email.send()
+
+#             # return Response({'message': 'Booking confirmed. Check your email for details.'}, status=status.HTTP_201_CREATED)
+#             return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# -------------------------------
+
+
+
+
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-# from .models import Booking, Hotel, UserAccount
+from .models import Booking, Hotel
 from .serializers import BookingSerializer
 from django.db import transaction
 
+@api_view(['GET'])
+def list_hotels(request):
+    hotels = Hotel.objects.all()
+    serializer = HotelSerializer(hotels, many=True)
+    return Response(serializer.data)
+
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def book_hotel(request):
     user = request.user
+
     try:
         user_account = user.account
     except UserAccount.DoesNotExist:
-        return Response({'error': 'User account not found'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'User account not found'}, status=status.HTTP_404_NOT_FOUND)
 
     serializer = BookingSerializer(data=request.data)
     if serializer.is_valid():
-        hotel_id = serializer.validated_data['hotel'].id
-        number_of_rooms = serializer.validated_data['number_of_rooms']
-        start_date = serializer.validated_data['start_date']
-        end_date = serializer.validated_data['end_date']
-
         try:
+            hotel_id = serializer.validated_data['hotel'].id
+            number_of_rooms = serializer.validated_data['number_of_rooms']
+            start_date = serializer.validated_data['start_date']
+            end_date = serializer.validated_data['end_date']
+
             hotel = Hotel.objects.get(id=hotel_id)
+            
+            total_days = (end_date - start_date).days
+            total_cost = hotel.price_per_night * number_of_rooms * total_days
+
+            if user_account.balance < total_cost:
+                return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if hotel.available_room < number_of_rooms:
+                return Response({'error': 'Not enough rooms available'}, status=status.HTTP_400_BAD_REQUEST)
+
+            with transaction.atomic():
+                user_account.balance -= total_cost
+                user_account.save()
+
+                hotel.available_room -= number_of_rooms
+                hotel.save()
+
+                booking = serializer.save(user=user)
+                return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+
         except Hotel.DoesNotExist:
-            return Response({'error': 'Hotel not found'}, status=status.HTTP_400_BAD_REQUEST)
-
-        total_days = (end_date - start_date).days
-        total_cost = hotel.price_per_night * number_of_rooms * total_days
-
-        if user_account.balance < total_cost:
-            return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if hotel.available_room < number_of_rooms:
-            return Response({'error': 'Not enough rooms available'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Use a transaction to ensure atomicity
-        with transaction.atomic():
-            # Deduct balance
-            user_account.balance -= total_cost
-            user_account.save()
-
-            # Decrease available rooms
-            hotel.available_room -= number_of_rooms
-            hotel.save()
-
-            # Save the booking
-            booking = serializer.save(user=user)
-             # Send booking confirmation email
-            email_subject = "Booking Confirmation"
-            email_body = render_to_string('book_confirm_email.html', {
-                'hotel_name': hotel.name,
-                'start_date': start_date,
-                'end_date': end_date,
-                'total_cost': total_cost,
-                'pdf_link': request.build_absolute_uri(reverse('download_booking_pdf', args=[booking.id]))
-            })
-            email = EmailMultiAlternatives(email_subject, '', to=[user.email])
-            email.attach_alternative(email_body, "text/html")
-            email.send()
-
-            # return Response({'message': 'Booking confirmed. Check your email for details.'}, status=status.HTTP_201_CREATED)
-            return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+            return Response({'error': 'Hotel not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -41,7 +41,13 @@ class ReviewSerializer(serializers.ModelSerializer):
 from rest_framework import serializers
 from .models import Booking
 
+# class BookingSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Booking
+#         fields = ['user', 'hotel', 'start_date', 'end_date', 'number_of_rooms']
+
+
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
-        fields = ['user', 'hotel', 'start_date', 'end_date', 'number_of_rooms']
+        fields = ['hotel', 'start_date', 'end_date', 'number_of_rooms']
