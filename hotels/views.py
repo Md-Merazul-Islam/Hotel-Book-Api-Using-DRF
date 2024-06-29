@@ -163,7 +163,7 @@ class BookHotelView(APIView):
 class BookingListAPIView(generics.ListAPIView):
     # queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)
