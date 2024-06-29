@@ -17,7 +17,7 @@ urlpatterns = [
     path('reviews/<int:pk>/', ReviewDetailAPIView.as_view(), name='review-detail'),
     path('reviews/', AllReviewsListAPIView.as_view(), name='all-reviews-list'),
     path('book/', BookHotelView.as_view(), name='book_hotel'),
-    path('booked/<int:pk>/', BookingListAPIView.as_view(), name='booking-list'),
+    path('bookings/', BookingListAPIView.as_view(), name='booking-list'),
     
 ]
 
