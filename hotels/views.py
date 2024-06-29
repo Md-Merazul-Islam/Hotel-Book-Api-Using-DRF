@@ -1,5 +1,7 @@
 
 
+from .serializers import BookingSerializer
+from rest_framework.permissions import IsAuthenticated
 from .models import Booking, Hotel
 from rest_framework import status
 from xhtml2pdf import pisa
@@ -241,9 +243,6 @@ class AllReviewsListAPIView(generics.ListAPIView):
 # ----------------------------------------------------
 
 
-
-
-
 # from rest_framework import status, permissions
 # from rest_framework.response import Response
 # from rest_framework.views import APIView
@@ -258,7 +257,7 @@ class AllReviewsListAPIView(generics.ListAPIView):
 
 # class BookingHotelView(APIView):
 #     permission_classes = [permissions.IsAuthenticated]
-    
+
 
 #     def post(self, request):
 #         try:
@@ -352,22 +351,6 @@ class AllReviewsListAPIView(generics.ListAPIView):
 #             return Response({'message': 'Booking confirmed. Check your email for details.'}, status=status.HTTP_201_CREATED)
 #         else:
 #             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # -------------------------
@@ -471,7 +454,7 @@ class AllReviewsListAPIView(generics.ListAPIView):
 # from rest_framework import status
 # from .models import Booking, Hotel
 # from .serializers import BookingSerializer
-# from account.models import UserAccount  
+# from account.models import UserAccount
 
 
 # class BookHotelView(APIView):
@@ -491,45 +474,12 @@ class AllReviewsListAPIView(generics.ListAPIView):
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
-
-
-
-
-import logging
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
-from .serializers import BookingSerializer
-
-# Set up logging
-logger = logging.getLogger(__name__)
-
 class BookHotelView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        logger.info("Booking request received.")
-        
-        # Pass the request context to the serializer
-        serializer = BookingSerializer(data=request.data, context={'request': request})
-        
+    def post(self, request):
+        serializer = BookingSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                # Save the booking if data is valid
-                booking = serializer.save()
-                
-                logger.info(f"Booking successful for user {request.user.username}.")
-                return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                # Log any exceptions that occur during the booking process
-                logger.error(f"Booking failed: {e}")
-                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        # Log validation errors
-        logger.warning(f"Validation errors: {serializer.errors}")
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            booking = serializer.save()
+            return Response({'message': 'You have successfully book the hotel  '})
+        return Response(serializer.errors)
