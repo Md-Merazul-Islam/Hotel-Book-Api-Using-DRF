@@ -29,7 +29,19 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+        
+        
+class ReviewSerializerAll(serializers.ModelSerializer):
+    hotel = HotelSerializer()
+    user = serializers.SerializerMethodField()
 
+    def get_user(self, obj):
+        return obj.user.username if obj.user else None
+    
+    class Meta:
+        model = Review
+        fields = ['id', 'body', 'created', 'rating', 'hotel', 'user']
+        
 
 class BookingSerializer(serializers.Serializer):
     hotel_id = serializers.IntegerField()

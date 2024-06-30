@@ -15,7 +15,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Hotel, District, Review, Booking
-from .serializers import HotelSerializer, ReviewSerializer, DistrictSerializer, BookingSerializer
+from .serializers import HotelSerializer, ReviewSerializerAll, DistrictSerializer, BookingSerializer,ReviewSerializer
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 import json
@@ -102,7 +102,7 @@ def download_booking_pdf(request, booking_id):
 
 class AllReviewsListAPIView(generics.ListAPIView):
     queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+    serializer_class = ReviewSerializerAll
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
