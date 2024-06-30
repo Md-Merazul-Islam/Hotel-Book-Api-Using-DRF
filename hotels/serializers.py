@@ -28,8 +28,8 @@ class HotelSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source='user.username')
-    hotel = serializers.ReadOnlyField(source='hotel.name')
+    user = serializers.ReadOnlyField(source='user.id')
+    hotel = serializers.ReadOnlyField(source='hotel.id')
 
     class Meta:
         model = Review

@@ -119,7 +119,7 @@ class ReviewListCreateAPIView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         hotel_id = self.kwargs.get('hotel_id')
         hotel = generics.get_object_or_404(Hotel, pk=hotel_id)
-        serializer.save(user=self.request.user, hotel=hotel)
+        serializer.save(user=self.request.user.id, hotel=hotel)
 
 
 class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
