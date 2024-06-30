@@ -108,7 +108,7 @@ def download_booking_pdf(request, booking_id):
 
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['rating']
 
@@ -125,7 +125,7 @@ class ReviewListCreateAPIView(generics.ListCreateAPIView):
 class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_update(self, serializer):
         if self.request.user != self.get_object().user:
