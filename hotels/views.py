@@ -1,27 +1,21 @@
-
-
+from rest_framework import viewsets
 from rest_framework import generics
 from .models import Booking
 from .serializers import BookingSerializer
-from rest_framework.permissions import IsAuthenticated
 from .models import Booking, Hotel
 from rest_framework import status
 from xhtml2pdf import pisa
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 import os
 from django.conf import settings
 from django.http import HttpResponse
-from datetime import datetime
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Hotel, District, Review, Booking
 from .serializers import HotelSerializer, ReviewSerializer, DistrictSerializer, BookingSerializer
-from account.models import UserAccount
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 import json
@@ -106,50 +100,22 @@ def download_booking_pdf(request, booking_id):
     return response
 
 
-class ReviewListCreateAPIView(generics.ListCreateAPIView):
-    serializer_class = ReviewSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['rating']
-
-    def get_queryset(self):
-        hotel_id = self.kwargs.get('hotel_id')
-        return Review.objects.filter(hotel__id=hotel_id)
-
-    def perform_create(self, serializer):
-        hotel_id = self.kwargs.get('hotel_id')
-        hotel = generics.get_object_or_404(Hotel, pk=hotel_id)
-        serializer.save(user=self.request.user.id, hotel=hotel)
-
-
-class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def perform_update(self, serializer):
-        if self.request.user != self.get_object().user:
-            raise permissions.PermissionDenied(
-                "You can only edit your own reviews.")
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if self.request.user != instance.user:
-            raise permissions.PermissionDenied(
-                "You can only delete your own reviews.")
-        instance.delete()
-
-
 class AllReviewsListAPIView(generics.ListAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['hotel_id']
 
 
 class BookHotelView(APIView):
-    # permission_classes = [IsAuthenticated]
     def post(self, request):
-        serializer = BookingSerializer(data=request.data, context={'request': request})
+        serializer = BookingSerializer(
+            data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
                 booking = serializer.save()
@@ -161,9 +127,7 @@ class BookHotelView(APIView):
 
 
 class BookingListAPIView(generics.ListAPIView):
-    # queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)

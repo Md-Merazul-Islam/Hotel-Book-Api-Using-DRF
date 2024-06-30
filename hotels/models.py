@@ -38,6 +38,7 @@ class Booking(models.Model):
     def __str__(self):
         return f'Booking by {self.user.username} at {self.hotel.name} from {self.start_date} to {self.end_date}'
 
+
 class Review(models.Model):
     STAR_CHOICES = [
         ('⭐', '⭐'),
@@ -46,8 +47,8 @@ class Review(models.Model):
         ('⭐⭐⭐⭐', '⭐⭐⭐⭐'),
         ('⭐⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'),
     ]
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel,on_delete=models.SET_NULL, null=True, blank=True,related_name='reviews',)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     rating = models.CharField(choices=STAR_CHOICES, max_length=10)

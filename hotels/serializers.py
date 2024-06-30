@@ -9,14 +9,12 @@ from account.models import UserAccount
 from django.utils.translation import gettext_lazy as _
 
 
-
 class DistrictSerializer(serializers.ModelSerializer):
     class Meta:
         model = District
         fields = '__all__'
 
 class HotelSerializer(serializers.ModelSerializer):
-
     district_name = serializers.SerializerMethodField()
 
     def get_district_name(self, obj):
@@ -28,13 +26,10 @@ class HotelSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user_id = serializers.ReadOnlyField(source='user.id')
-    hotel_id = serializers.ReadOnlyField(source='hotel.id')
-
     class Meta:
         model = Review
-        fields = [ 'id','hotel_id', 'user_id', 'body', 'created', 'rating']
-        read_only_fields = ['id', 'user_id', 'hotel_id']
+        fields = '__all__'
+
 
 class BookingSerializer(serializers.Serializer):
     hotel_id = serializers.IntegerField()
@@ -115,3 +110,6 @@ class BookingSerializer(serializers.Serializer):
             return booking
         except Exception as e:
             raise serializers.ValidationError({'error': _('Failed to create booking.')})
+
+
+
