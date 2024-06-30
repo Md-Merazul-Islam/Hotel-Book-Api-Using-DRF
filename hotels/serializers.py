@@ -28,13 +28,13 @@ class HotelSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source='user.id')
-    hotel = serializers.ReadOnlyField(source='hotel.id')
+    user_id = serializers.ReadOnlyField(source='user.id')
+    hotel_id = serializers.ReadOnlyField(source='hotel.id')
 
     class Meta:
         model = Review
-        fields = ['id', 'hotel', 'user', 'body', 'created', 'rating']
-
+        fields = [ 'id','hotel_id', 'user_id', 'body', 'created', 'rating']
+        read_only_fields = ['id', 'user_id', 'hotel_id']
 
 class BookingSerializer(serializers.Serializer):
     hotel_id = serializers.IntegerField()
