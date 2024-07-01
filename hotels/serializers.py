@@ -3,7 +3,6 @@ from django.db import transaction
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
 from .models import Hotel, Review, Booking, District
 from account.models import UserAccount
 from django.utils.translation import gettext_lazy as _

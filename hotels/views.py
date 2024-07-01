@@ -18,7 +18,7 @@ from .models import Hotel, District, Review, Booking
 from .serializers import HotelSerializer, ReviewSerializerAll, DistrictSerializer, BookingSerializer,ReviewSerializer
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
-import json
+
 
 
 class DistrictListAPIView(generics.ListCreateAPIView):
@@ -86,7 +86,7 @@ def download_booking_pdf(request, booking_id):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename=Booking_Confirmation_{booking.id}.pdf'
 
-    # Generate PDF from HTML string using xhtml2pdf
+    # Generate PDF from HTML 
     pisa_status = pisa.CreatePDF(
         html_string, dest=response,
         link_callback=lambda uri, _: os.path.join(

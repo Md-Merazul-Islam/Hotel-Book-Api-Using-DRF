@@ -1,5 +1,4 @@
 
-from decimal import Decimal
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
@@ -112,8 +111,6 @@ def successful(request):
     return render(request, 'successful.html')
 
 # add unsuccessful message
-
-
 def unsuccessful(request):
     return render(request, 'unsuccessful.html')
 
