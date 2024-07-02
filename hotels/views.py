@@ -1,11 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import generics
-from .models import Booking
 from .serializers import BookingSerializer
-from .models import Booking, Hotel
-from rest_framework import status
 from xhtml2pdf import pisa
-from django.shortcuts import get_object_or_404
 import os
 from django.conf import settings
 from django.http import HttpResponse
@@ -18,7 +14,8 @@ from .models import Hotel, District, Review, Booking
 from .serializers import HotelSerializer, ReviewSerializerAll, DistrictSerializer, BookingSerializer,ReviewSerializer
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
-
+from .permissions import IsAuthorOrReadOnly 
+from rest_framework.permissions import IsAuthenticated
 
 
 class DistrictListAPIView(generics.ListCreateAPIView):
@@ -79,10 +76,10 @@ def download_booking_pdf(request, booking_id):
         'total_cost': total_cost,
     }
 
-    # Render the booking details HTML template to
+    # booking details HTML template to
     html_string = render_to_string('booking_details.html', context)
 
-    # Create HTTP response with PDF content type
+    # Create HTTP response with PDF 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename=Booking_Confirmation_{booking.id}.pdf'
 
@@ -93,7 +90,7 @@ def download_booking_pdf(request, booking_id):
             settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, ''))
     )
 
-    # Check for errors during PDF generation
+    # PDF generation
     if pisa_status.err:
         return HttpResponse('We had some errors <pre>' + html.escape(html_string) + '</pre>')
 
@@ -105,11 +102,11 @@ class AllReviewsListAPIView(generics.ListAPIView):
     serializer_class = ReviewSerializerAll
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['hotel_id']
+# class ReviewViewSet(viewsets.ModelViewSet):
+#     queryset = Review.objects.all()
+#     serializer_class = ReviewSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['hotel_id']
 
 
 class BookHotelView(APIView):
@@ -131,3 +128,27 @@ class BookingListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['hotel_id']
+    permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]  
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
