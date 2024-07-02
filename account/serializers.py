@@ -101,3 +101,28 @@ class DepositSerializer(serializers.ModelSerializer):
         )
 
         return transaction
+
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    account_no  = serializers.IntegerField(source='account.account_no',read_only=True)
+    balance = serializers.DecimalField(source='account.balance',max_digits=10,decimal_places=2)
+    profile_image = serializers.ImageField(source='account.profile_image',allow_null=True,required =False)
+    
+    class Meta:
+        model =User
+        fields =['username','first_name','last_name','email','account_no','balance','profile_image']
+        
+    def update(self,instance,validated_data):
+        account_data = validated_data.pop('account',None)
+        
+        instance.first_name = validated_data.get('first_name',instance.firs_name)
+        instance.last_name = validated_data.get('last_name',instance.last_name)
+        instance.email= validated_data.get('email',instance.email)
+        instance.save()
+        
+        if account_data:
+            account = instance.account
+            account.profile_image = account_data.get('profile_image',account.profile_image)
+            account.save()
+        return instance

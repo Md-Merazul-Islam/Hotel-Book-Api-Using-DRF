@@ -6,7 +6,7 @@ from . models import UserAccount
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.encoding import force_bytes
-from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer, AllUserSerializer, DepositSerializer
+from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer, AllUserSerializer, DepositSerializer,UserDetailSerializer
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate, login, logout
@@ -15,6 +15,8 @@ from django.template.loader import render_to_string
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
+from rest_framework import generics
+
 
 
 
@@ -129,3 +131,29 @@ class DepositViewSet(APIView):
             return Response(response_data)
         else:
             return Response(serializer.errors)
+        
+        
+
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import User
+from .serializers import UserDetailSerializer
+
+class UserDetailView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserDetailSerializer
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access this endpoint
+
+    def get_queryset(self):
+        # Optionally, restrict the queryset to only return the requesting user's information
+        user = self.request.user
+        return User.objects.filter(id=user.id)
+
+
+
+class UserUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserDetailSerializer
+    permission_classes = [IsAuthenticated]
+    def get_object(self):
+        return self.request.user
