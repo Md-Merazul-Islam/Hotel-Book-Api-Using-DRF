@@ -57,4 +57,7 @@ class Review(models.Model):
         unique_together = ('hotel', 'user')
 
     def __str__(self):
-        return f'Review by {self.user.username} for {self.hotel.name}'
+        if self.user:
+            return f'Review by {self.user.username} for {self.hotel.name}'
+        else:
+            return f'Review for {self.hotel.name} (User not specified)'

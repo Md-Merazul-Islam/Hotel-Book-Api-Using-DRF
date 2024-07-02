@@ -24,10 +24,10 @@ class HotelSerializer(serializers.ModelSerializer):
         fields = ['id','name','address','district_name','photo','address','description','price_per_night','available_room']
 
 
-# class ReviewSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Review
-#         fields = '__all__'
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
         
         
 class ReviewSerializerAll(serializers.ModelSerializer):
@@ -124,7 +124,7 @@ class BookingSerializer(serializers.Serializer):
 
 
 
-# ---------------------------------
+# # ---------------------------------
 
 from rest_framework import serializers
 from .models import Review
@@ -133,13 +133,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-        read_only_fields = ['user', 'created']  # Prevent user and creation date from being modified directly
+        read_only_fields = ['user', 'created']  
 
     def validate(self, data):
         user = self.context['request'].user
         hotel = data.get('hotel')
 
-        if self.instance is None:  # Check only for new reviews
+        if self.instance is None:  
             if Review.objects.filter(user=user, hotel=hotel).exists():
                 raise serializers.ValidationError("You have already reviewed this hotel.")
         

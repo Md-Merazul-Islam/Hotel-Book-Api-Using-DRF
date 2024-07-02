@@ -102,11 +102,11 @@ class AllReviewsListAPIView(generics.ListAPIView):
     serializer_class = ReviewSerializerAll
 
 
-# class ReviewViewSet(viewsets.ModelViewSet):
-#     queryset = Review.objects.all()
-#     serializer_class = ReviewSerializer
-#     filter_backends = [DjangoFilterBackend]
-#     filterset_fields = ['hotel_id']
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['hotel_id']
 
 
 class BookHotelView(APIView):
@@ -129,26 +129,3 @@ class BookingListAPIView(generics.ListAPIView):
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)
 
-
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['hotel_id']
-    permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]  
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
