@@ -102,22 +102,12 @@ class AllReviewsListAPIView(generics.ListAPIView):
     serializer_class = ReviewSerializerAll
 
 
-# class ReviewViewSet(viewsets.ModelViewSet):
-#     queryset = Review.objects.all()
-#     serializer_class = ReviewSerializer
-#     filter_backends = [DjangoFilterBackend]
-#     filterset_fields = ['hotel_id']
-
-
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['hotel_id']
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 class BookHotelView(APIView):

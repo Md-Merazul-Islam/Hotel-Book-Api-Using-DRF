@@ -10,7 +10,7 @@ from .views import (
 )
 
 router.register('review_add',ReviewViewSet)
-# router.register(r'reviews', ReviewViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),
