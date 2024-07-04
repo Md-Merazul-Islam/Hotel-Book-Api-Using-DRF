@@ -123,24 +123,3 @@ class BookingSerializer(serializers.Serializer):
             raise serializers.ValidationError({'error': _('Failed to create booking.')})
 
 
-
-# # ---------------------------------
-
-from rest_framework import serializers
-from .models import Review
-
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = '__all__'
-        read_only_fields = ['user', 'created']  
-
-    def validate(self, data):
-        user = self.context['request'].user
-        hotel = data.get('hotel')
-
-        if self.instance is None:  
-            if Review.objects.filter(user=user, hotel=hotel).exists():
-                raise serializers.ValidationError("You have already reviewed this hotel.")
-        
-        return data
