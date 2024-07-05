@@ -126,3 +126,16 @@ class UserDetailSerializer(serializers.ModelSerializer):
             account.profile_image = account_data.get('profile_image',account.profile_image)
             account.save()
         return instance
+    
+    
+    
+    
+# ---------------------admin --------------------
+
+from rest_framework import serializers
+from .models import User
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'is_staff']  

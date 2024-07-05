@@ -1,12 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
-from .views import UserUpdateView,CustomTokenObtainPairView
+from .views import UserUpdateView
 
 router = DefaultRouter()
 router.register('account', views.UserAccountViewSet, basename='user-account')
 router.register('allUser', views.AllUserViewSet)
-
+router.register(r'is_users_staff', views.UserViewSet, basename='is_users_staf')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -18,5 +18,4 @@ urlpatterns = [
     path('successful-email-verified/', views.successful, name='verified_success'),
     path('unsuccessful-email-verified/',views.unsuccessful, name='verified_unsuccess'),
     path('update/', UserUpdateView.as_view(), name='user-update'),
-    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
 ]
