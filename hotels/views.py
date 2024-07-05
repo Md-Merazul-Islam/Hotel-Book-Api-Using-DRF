@@ -14,14 +14,15 @@ from .models import Hotel, District, Review, Booking
 from .serializers import HotelSerializer, ReviewSerializerAll, DistrictSerializer, BookingSerializer,ReviewSerializer
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .permissions import IsAuthorOrReadOnly 
+from .permissions import IsAdminOrReadOnly 
 from rest_framework.permissions import IsAuthenticated
 
 
 class DistrictListAPIView(generics.ListCreateAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes=[IsAdminOrReadOnly]
 
 
 class DistrictDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -42,9 +43,10 @@ class HotelFilter(filters.FilterSet):
 class HotelListAPIView(generics.ListCreateAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = HotelFilter
+    permission_classes=[IsAdminOrReadOnly]
 
 
 class HotelDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
