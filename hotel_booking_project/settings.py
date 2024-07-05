@@ -20,6 +20,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5500',
+    'http://127.0.0.1:5501',
     'https://*.127.0.0.1',
     'https://blueskybooking.onrender.com',
 ]
@@ -31,6 +32,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://blueskybooking.onrender.com',
     'https://*.127.0.0.1',
     'http://127.0.0.1:5500',
+    'http://127.0.0.1:5501',
 
 ]
 
@@ -67,9 +69,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
+    'corsheaders',
     'account',
     'hotels',
-    'corsheaders',
 
 ]
 
