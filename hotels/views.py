@@ -46,7 +46,7 @@ class HotelListAPIView(generics.ListCreateAPIView):
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = HotelFilter
-    permission_classes=[IsAdminOrReadOnly]
+    # permission_classes=[IsAdminOrReadOnly]
 
 
 class HotelDetailAPIView(generics.RetrieveUpdateDestroyAPIView):

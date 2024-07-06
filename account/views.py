@@ -143,10 +143,9 @@ from .serializers import UserDetailSerializer
 class UserDetailView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access this endpoint
+    permission_classes = [IsAuthenticated] 
 
     def get_queryset(self):
-        # Optionally, restrict the queryset to only return the requesting user's information
         user = self.request.user
         return User.objects.filter(id=user.id)
 
