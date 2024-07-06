@@ -22,7 +22,7 @@ class DistrictListAPIView(generics.ListCreateAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    # permission_classes=[IsAdminOrReadOnly]
+    permission_classes=[IsAdminOrReadOnly]
 
 
 class DistrictDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
