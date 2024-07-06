@@ -82,6 +82,8 @@ REST_FRAMEWORK = {
     ],
 }
 
+REST_AUTH_TOKEN_MODEL = 'knox.models.AuthToken'
+REST_AUTH_TOKEN_CREATOR = 'project.apps.accounts.utils.create_knox_token'
 # REST_FRAMEWORK = {
 #     'DEFAULT_PERMISSION_CLASSES': [
 #         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
