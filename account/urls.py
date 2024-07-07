@@ -17,5 +17,6 @@ urlpatterns = [
     path('deposit/', views.DepositViewSet.as_view(), name='deposit'),
     path('successful-email-verified/', views.successful, name='verified_success'),
     path('unsuccessful-email-verified/',views.unsuccessful, name='verified_unsuccess'),
+     path('update/',views. UserDetailView.as_view(), name='user-update'),
  
 ]
