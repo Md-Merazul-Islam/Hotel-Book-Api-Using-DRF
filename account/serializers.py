@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 
+
 class UserAccountSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
 
@@ -132,8 +133,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     
 # ---------------------admin --------------------
 
-from rest_framework import serializers
-from .models import User
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -141,12 +141,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'is_staff']  
 
 
-
-
-
-from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import UserAccount
 
 class CurrentUserDetailSerializer(serializers.ModelSerializer):
     account_no = serializers.IntegerField(source='account.account_no', read_only=True)

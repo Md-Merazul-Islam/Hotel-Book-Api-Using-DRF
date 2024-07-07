@@ -16,7 +16,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import generics
-
+from .permissions import IsAdminOrReadOnly 
+from django.contrib.auth.models import User
+from .serializers import CurrentUserDetailSerializer
+from rest_framework import viewsets
+from .serializers import UserSerializer
 
 
 
@@ -25,11 +29,14 @@ from rest_framework import generics
 class AllUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AllUserSerializer
+    permission_classes=[IsAdminOrReadOnly]
 
 
 class UserAccountViewSet(viewsets.ModelViewSet):
-    serializer_class = UserAccountSerializer
     queryset = UserAccount.objects.all()
+    serializer_class = UserAccountSerializer
+    permission_classes=[IsAdminOrReadOnly]
+    
 
 
 class UserRegistrationSerializerViewSet(APIView):
@@ -160,23 +167,11 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
 
 
 # ---------------admin interface --------------------
-from rest_framework import viewsets
-from .models import User
-from .serializers import UserSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-
-
-
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
-from .serializers import CurrentUserDetailSerializer
 
 class CurrentUserDetailView(APIView):
     permission_classes = [IsAuthenticated]
