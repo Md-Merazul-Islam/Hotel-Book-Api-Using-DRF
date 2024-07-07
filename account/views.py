@@ -6,7 +6,7 @@ from . models import UserAccount
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.encoding import force_bytes
-from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer, AllUserSerializer, DepositSerializer,UserDetailSerializer
+from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer, AllUserSerializer, DepositSerializer
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate, login, logout
@@ -18,12 +18,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import generics
 from .permissions import IsAdminOrReadOnly 
 from django.contrib.auth.models import User
-from .serializers import CurrentUserDetailSerializer
+
 from rest_framework import viewsets
 from .serializers import UserSerializer
-
-
-
 
 
 class AllUserViewSet(viewsets.ModelViewSet):
@@ -124,7 +121,6 @@ def unsuccessful(request):
     return render(request, 'unsuccessful.html')
 
 
-
 class DepositViewSet(APIView):
     def post(self, request):
         serializer = DepositSerializer(data=request.data)
@@ -139,44 +135,10 @@ class DepositViewSet(APIView):
         else:
             return Response(serializer.errors)
         
-        
-
-
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
-from .serializers import UserDetailSerializer
-
-class UserDetailView(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserDetailSerializer
-    permission_classes = [IsAuthenticated] 
-
-    def get_queryset(self):
-        user = self.request.user
-        return User.objects.filter(id=user.id)
-
-
-
-class UserUpdateView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserDetailSerializer
-    permission_classes = [IsAuthenticated]
-    def get_object(self):
-        return self.request.user
-
-
-
-# ---------------admin interface --------------------
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
-class CurrentUserDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        serializer = CurrentUserDetailSerializer(user)
-        return Response(serializer.data)
+# -------------------------------------

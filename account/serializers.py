@@ -5,8 +5,6 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-
-
 class UserAccountSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
 
@@ -131,7 +129,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
     
     
     
-# ---------------------admin --------------------
 
 
 
@@ -140,15 +137,5 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'is_staff']  
 
+# ---------------------admin --------------------
 
-
-class CurrentUserDetailSerializer(serializers.ModelSerializer):
-    account_no = serializers.IntegerField(source='account.account_no', read_only=True)
-    balance = serializers.DecimalField(source='account.balance', max_digits=12, decimal_places=2, read_only=True)
-    profile_image = serializers.ImageField(source='account.profile_image', allow_null=True, required=False, read_only=True)
-    # Remove the source argument as it's redundant
-    is_staff = serializers.BooleanField(read_only=True)
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'account_no', 'balance', 'profile_image', 'is_staff']
