@@ -11,7 +11,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Hotel, District, Review, Booking
-from .serializers import HotelSerializer, ReviewSerializerAll, DistrictSerializer, BookingSerializer,ReviewSerializer
+from .serializers import HotelSerializer, ReviewSerializerAll, DistrictSerializer, BookingSerializer,ReviewSerializer,AllBookingSerializer
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .permissions import IsAdminOrReadOnly 
@@ -125,9 +125,9 @@ class BookHotelView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class BookingListAPIView(generics.ListAPIView):
-    serializer_class = BookingSerializer
 
-    def get_queryset(self):
-        return Booking.objects.filter(user=self.request.user)
 
+class AllBookingsListAPIView(generics.ListAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = AllBookingSerializer
+    permission_classes = [IsAdminOrReadOnly]

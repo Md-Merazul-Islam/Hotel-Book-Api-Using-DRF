@@ -123,3 +123,14 @@ class BookingSerializer(serializers.Serializer):
             raise serializers.ValidationError({'error': _('Failed to create booking.')})
 
 
+
+class AllBookingSerializer(serializers.ModelSerializer):
+    hotel = HotelSerializer()
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return obj.user.username if obj.user else None
+
+    class Meta:
+        model = Booking
+        fields = ['id', 'hotel', 'start_date', 'end_date', 'number_of_rooms', 'booked_at', 'user']
