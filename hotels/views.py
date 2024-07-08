@@ -21,7 +21,6 @@ from rest_framework.permissions import IsAuthenticated
 class DistrictListAPIView(generics.ListCreateAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     permission_classes=[IsAdminOrReadOnly]
 
 
@@ -51,13 +50,10 @@ class HotelListAPIView(generics.ListCreateAPIView):
 class HotelDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes=[IsAdminOrReadOnly]
 
 
-class BookingDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
 def download_booking_pdf(request, booking_id):
