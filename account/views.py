@@ -1,4 +1,5 @@
 
+from .serializers import UserDetailSerializer
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
@@ -141,16 +142,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes=[IsAdminOrReadOnly]
 
-
-# -------------------------------------
-
-
-
-# views.py
-
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
-from .serializers import UserDetailSerializer
 
 class UserDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = UserDetailSerializer
