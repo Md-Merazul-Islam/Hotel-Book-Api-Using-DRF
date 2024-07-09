@@ -7,7 +7,7 @@ from . models import UserAccount
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.encoding import force_bytes
-from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer, AllUserSerializer, DepositSerializer
+from . serializers import UserAccountSerializer, UserRegistrationSerializer, UserLoginSerializer, AllUserSerializer, DepositSerializer,UserSerializer
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import authenticate, login, logout
@@ -18,10 +18,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework import generics
 from .permissions import IsAdminOrReadOnly 
-from django.contrib.auth.models import User
-
 from rest_framework import viewsets
-from .serializers import UserSerializer
+
 
 
 class AllUserViewSet(viewsets.ModelViewSet):
@@ -113,7 +111,7 @@ class UserLogoutApiView(APIView):
         return redirect('login')
 
 
-# add success or fail message
+# add success message
 def successful(request):
     return render(request, 'successful.html')
 

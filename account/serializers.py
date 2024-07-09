@@ -1,9 +1,8 @@
-
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Transaction, UserAccount
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from rest_framework import serializers
+
 
 class UserAccountSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
@@ -32,8 +31,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password = self.validated_data['password']
         password2 = self.validated_data['confirm_password']
         if password != password2:
-            raise serializers.ValidationError(
-                {'error': "Password doesn't match"})
+            raise serializers.ValidationError({'error': "Password doesn't match"})
 
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
@@ -106,15 +104,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'is_staff']  
 
-# ---------------------admin --------------------
-
-
-
-# serializers.py
-
-from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import UserAccount
 
 class UserDetailSerializer(serializers.ModelSerializer):
     account_no = serializers.IntegerField(source='account.account_no', read_only=True)
