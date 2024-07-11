@@ -1,0 +1,9 @@
+username : merazul
+password : meraz1234
+
+Store ID: bookh668dde6d76e0c
+Store Password (API/Secret Key): bookh668dde6d76e0c@ssl
+
+
+
+

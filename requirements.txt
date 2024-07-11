@@ -21,6 +21,7 @@ distlib
 dj-database-url
 Django
 django-allauth
+django-bootstrap5
 django-cors-headers
 django-crispy-forms
 django-email
@@ -55,6 +56,7 @@ packaging
 parso
 pickleshare
 Pillow
+pip
 pipenv
 platformdirs
 prompt-toolkit
@@ -88,13 +90,16 @@ pyzmq
 qrcode
 reportlab
 requests
+setuptools
 six
 sqlparse
+sslcommerz-lib
 stack-data
 svglib
 tinycss2
 tornado
 traitlets
+typing_extensions
 tzdata
 tzlocal
 uritools
