@@ -51,9 +51,6 @@ class PaymentSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {'error': _('Invalid booking dates')})
 
-        if user_account.balance < total_cost:
-            raise serializers.ValidationError(
-                {'error': _('Insufficient balance')})
 
         if hotel.available_room < number_of_rooms:
             raise serializers.ValidationError(
@@ -74,19 +71,14 @@ class PaymentSerializer(serializers.Serializer):
             end_date = validated_data['end_date']
 
             with transaction.atomic():
-                # Deduct balance from user account (if required)
-                # user_account.balance -= total_cost
-                # user_account.save(update_fields=['balance'])
-
-                # Decrease available rooms in hotel
 
                 # Initiate payment gateway process
                 transaction_id = generate_transaction_id()
 
                 settings = {
-                    'store_id': 'your_store_id_here',
-                    'store_pass': 'your_store_pass_here',
-                    'issandbox': True  # Set to False for production environment
+                    'store_id': 'bookh668dde6d76e0c',
+                    'store_pass': 'bookh668dde6d76e0c@ssl',
+                    'issandbox': True  
                 }
 
                 sslcz = SSLCOMMERZ(settings)
@@ -103,10 +95,10 @@ class PaymentSerializer(serializers.Serializer):
                     'emi_option': 0,
                     'cus_name': user_account.user.first_name,
                     'cus_email': user_account.user.email,
-                    'cus_phone': "01401734642",  # Update with user's phone number
-                    'cus_add1': "Mymensingh ",  # Update with user's address
-                    'cus_city': "Dhaka",  # Update with user's city
-                    'cus_country': "Bangladesh",  # Update with user's country
+                    'cus_phone': "01401734642",  
+                    'cus_add1': "Mymensingh ", 
+                    'cus_city': "Dhaka",  
+                    'cus_country': "Bangladesh",  
                     'shipping_method': "NO",
                     'num_of_item': number_of_rooms,
                     'product_name': hotel.name,
@@ -127,27 +119,27 @@ class PaymentSerializer(serializers.Serializer):
                         start_date=start_date,
                         end_date=end_date,
                         number_of_rooms=number_of_rooms,
-                        total_cost=total_cost,
-                        transaction_id=transaction_id
+                        # total_cost=total_cost,
+                        # transaction_id=transaction_id
                     )
 
                     hotel = validated_data['hotel']
                     hotel.available_room -= number_of_rooms
                     hotel.save(update_fields=['available_room'])
 
-                    # Sending booking confirmation email
-                    email_subject = _("Booking Confirmation")
-                    email_body = render_to_string('book_confirm_email.html', {
-                        'hotel_name': hotel.name,
-                        'start_date': start_date,
-                        'end_date': end_date,
-                        'total_cost': total_cost,
-                        'pdf_link': self.context['request'].build_absolute_uri(reverse('download_booking_pdf', args=[booking.id]))
-                    })
-                    email = EmailMultiAlternatives(
-                        email_subject, '', to=[user_account.user.email])
-                    email.attach_alternative(email_body, "text/html")
-                    email.send()
+                    # # Sending booking confirmation email
+                    # email_subject = _("Booking Confirmation")
+                    # email_body = render_to_string('book_confirm_email.html', {
+                    #     'hotel_name': hotel.name,
+                    #     'start_date': start_date,
+                    #     'end_date': end_date,
+                    #     'total_cost': total_cost,
+                    #     'pdf_link': self.context['request'].build_absolute_uri(reverse('download_booking_pdf', args=[booking.id]))
+                    # })
+                    # email = EmailMultiAlternatives(
+                    #     email_subject, '', to=[user_account.user.email])
+                    # email.attach_alternative(email_body, "text/html")
+                    # email.send()
 
                     return {
                         'booking_id': booking.id,
