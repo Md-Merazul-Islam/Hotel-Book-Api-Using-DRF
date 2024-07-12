@@ -193,9 +193,9 @@ def payment_success(request):
             return render(request, 'booking_fail.html')
 
     return HttpResponse("Payment success page. This page should be accessed via POST request from the payment gateway.")
-
+@csrf_exempt
 def booking_fail(request):
     return render(request, 'booking_fail.html')
-
+@csrf_exempt
 def booking_cancel(request):
     return render(request, 'booking_cancel.html')
