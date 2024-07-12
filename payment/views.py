@@ -53,7 +53,7 @@ class PaymentSerializer(serializers.Serializer):
             raise serializers.ValidationError({'error': _('User account does not exist')})
 
         total_days = (end_date - start_date).days
-        total_cost = hotel.price_per_night * number_of_rooms * total_days
+        total_cost = hotel.price_per_night * number_of_rooms * total_days *117
 
         if total_days <= 0:
             raise serializers.ValidationError({'error': _('Invalid booking dates')})
