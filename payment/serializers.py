@@ -1,3 +1,6 @@
+from hotels.models import Booking
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -7,7 +10,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
 from hotels.models import Booking, Hotel
 from account.models import UserAccount
-from sslcommerz_lib import SSLCOMMERZ 
+from sslcommerz_lib import SSLCOMMERZ
 import uuid
 from datetime import datetime
 
@@ -51,7 +54,6 @@ class PaymentSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {'error': _('Invalid booking dates')})
 
-
         if hotel.available_room < number_of_rooms:
             raise serializers.ValidationError(
                 {'error': _('Not enough rooms available')})
@@ -78,7 +80,7 @@ class PaymentSerializer(serializers.Serializer):
                 settings = {
                     'store_id': 'bookh668dde6d76e0c',
                     'store_pass': 'bookh668dde6d76e0c@ssl',
-                    'issandbox': True  
+                    'issandbox': True
                 }
 
                 sslcz = SSLCOMMERZ(settings)
@@ -95,10 +97,10 @@ class PaymentSerializer(serializers.Serializer):
                     'emi_option': 0,
                     'cus_name': user_account.user.first_name,
                     'cus_email': user_account.user.email,
-                    'cus_phone': "01401734642",  
-                    'cus_add1': "Mymensingh ", 
-                    'cus_city': "Dhaka",  
-                    'cus_country': "Bangladesh",  
+                    'cus_phone': "01401734642",
+                    'cus_add1': "Mymensingh ",
+                    'cus_city': "Dhaka",
+                    'cus_country': "Bangladesh",
                     'shipping_method': "NO",
                     'num_of_item': number_of_rooms,
                     'product_name': hotel.name,
@@ -153,3 +155,7 @@ class PaymentSerializer(serializers.Serializer):
         except Exception as e:
             raise serializers.ValidationError(
                 {'error': _('Failed to create booking.')})
+
+
+# ------------------
+#

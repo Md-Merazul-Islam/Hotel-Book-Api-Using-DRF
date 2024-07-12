@@ -5,7 +5,7 @@ import os
 env = environ.Env()
 environ.Env.read_env()
 SECRET_KEY = env("SECRET_KEY")
-
+APPEND_SLASH = False  # this is for payment gateway error 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = True

@@ -1,43 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Booking Successful</title>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0069d9;
-            border-color: #0062cc;
-        }
+      body {
+        background-color: #f8f9fa;
+      }
+      .container {
+        margin-top: 50px;
+      }
+      .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+      .btn-primary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="row mt-5">
-            <div class="col-md-6 offset-md-3 text-center">
-                <h1 class="mt-5 text-success">Booking Successful!</h1>
-                <p>Your booking and payment have been processed successfully.</p>
-                <p>An email confirmation has been sent to your registered email address.</p>
-                <a href="#" class="btn btn-primary mt-3">Back to Home</a>
-            </div>
+      <div class="row mt-5">
+        <div class="col-md-6 offset-md-3 text-center">
+          <h1 class="mt-5 text-success">Booking Successful!</h1>
+          {% comment %} <p>Your booking and payment have been processed successfully.</p>
+          <p>An email confirmation has been sent to your registered email address.</p>
+          <a href="#" class="btn btn-primary mt-3">Back to Home</a> {% endcomment %}
+
+
+          <hr>
+          <h2>Booking Successful</h2>
+          <p>Thank you, {{ booking.user.first_name }}! Your booking at {{ booking.hotel.name }} has been successfully completed.</p>
+          <p>Booking Details:</p>
+          <ul>
+            <li>Hotel: {{ booking.hotel.name }}</li>
+            <li>Start Date: {{ booking.start_date }}</li>
+            <li>End Date: {{ booking.end_date }}</li>
+            <li>Total Cost: {{ booking.total_cost }}</li>
+          </ul>
+          <p>A confirmation email has been sent to {{ booking.user.email }}.</p>
         </div>
+       
+      </div>
     </div>
     <!-- Bootstrap JS and other scripts -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+  </body>
 </html>
