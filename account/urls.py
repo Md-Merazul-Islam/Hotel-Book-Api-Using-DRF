@@ -7,7 +7,7 @@ router = DefaultRouter()
 router.register('account', views.UserAccountViewSet, basename='user-account')
 router.register('allUser', views.AllUserViewSet)
 router.register(r'is_users_staff', views.UserViewSet, basename='is_users_staf')
-
+router.register(r'admin-messages',views.AdminMessageViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('register/', views.UserRegistrationSerializerViewSet.as_view(), name='register'),

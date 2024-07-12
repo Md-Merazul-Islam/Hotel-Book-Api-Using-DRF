@@ -53,4 +53,13 @@ class Transaction(models.Model):
         email = EmailMultiAlternatives(email_subject, text_content, to=[user.email])
         email.attach_alternative(email_body, "text/html")
         email.send()
+
+
+class AdminMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject= models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return f"{self.subject} - {self.user.username}"

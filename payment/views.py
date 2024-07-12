@@ -119,7 +119,7 @@ class PaymentSerializer(serializers.Serializer):
                     )
 
                     booking_id = booking.id
-                    print("Booking id =================================================================",booking_id)
+                    print("Booking id =========================================",booking_id)
                     my_array.append(booking_id)
                     global_data[transaction_id] = user_account
                     return {

@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Transaction, UserAccount
+from .models import Transaction, UserAccount,AdminMessage
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
@@ -127,3 +127,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
             account.profile_image = account_data.get('profile_image', account.profile_image)
             account.save()
         return instance
+
+
+
+
+class AdminMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminMessage
+        fields = '__all__'
+        
