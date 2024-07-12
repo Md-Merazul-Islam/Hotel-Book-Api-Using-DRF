@@ -5,7 +5,7 @@ import os
 env = environ.Env()
 environ.Env.read_env()
 SECRET_KEY = env("SECRET_KEY")
-APPEND_SLASH = False  # this is for payment gateway error 
+APPEND_SLASH = False  # this is for payment gateway error
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = True
@@ -17,19 +17,18 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_ALLOW_ALL = True
 
 
-
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5500',
     'http://127.0.0.1:5501',
     'https://*.127.0.0.1',
     'https://blueskybooking.onrender.com',
+    'https://sandbox.sslcommerz.com',
 ]
-
-
 
 
 CSRF_TRUSTED_ORIGINS = [
     'https://blueskybooking.onrender.com',
+    'https://sandbox.sslcommerz.com',
     'https://*.127.0.0.1',
     'http://127.0.0.1:5500',
     'http://127.0.0.1:5501',
@@ -78,7 +77,7 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-     'DEFAULT_AUTHENTICATION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
