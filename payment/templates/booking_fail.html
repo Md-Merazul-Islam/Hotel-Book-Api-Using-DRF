@@ -31,7 +31,7 @@
           <h1 class="mt-5 text-danger">Booking Failed!</h1>
           <p>Unfortunately, your booking and payment could not be processed at this time.</p>
           <p>Please try again later or contact support for assistance.</p>
-          <a href="#" class="btn btn-primary mt-3">Back to Home</a>
+          <p> <a id="homeLink" href="https://bluskybooking.netlify.app/" class="btn btn-danger">Home</a></p>
         </div>
       </div>
     </div>
@@ -39,5 +39,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          const homeLink = document.getElementById('homeLink');
+          homeLink.addEventListener('click', function (event) {
+              event.preventDefault();
+              window.location.href = 'https://bluskybooking.netlify.app/';
+          });
+      });
+  </script>
   </body>
 </html>
