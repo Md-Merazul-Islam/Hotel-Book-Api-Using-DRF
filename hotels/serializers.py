@@ -90,8 +90,9 @@ class BookingSerializer(serializers.Serializer):
             end_date = validated_data['end_date']
 
             with transaction.atomic():
-                user_account.balance -= total_cost
-                user_account.save(update_fields=['balance'])
+                # user_account.balance -= total_cost
+                # user_account.save(update_fields=['balance'])
+                UserAccount.objects.filter(id=user_account.id).update(balance=user_account.balance - total_cost)
 
                 hotel = validated_data['hotel']
                 hotel.available_room -= number_of_rooms
