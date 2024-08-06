@@ -35,29 +35,29 @@ class UserAccountViewSet(viewsets.ModelViewSet):
     
 
 
-class UserRegistrationSerializerViewSet(APIView):
-    serializer_class = UserRegistrationSerializer
+# class UserRegistrationSerializerViewSet(APIView):
+#     serializer_class = UserRegistrationSerializer
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            print(user)
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
+#     def post(self, request):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             user = serializer.save()
+#             print(user)
+#             token = default_token_generator.make_token(user)
+#             uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            confirm_link = f"https://blueskybooking.onrender.com/user/active/{uid}/{token}"
-            email_subject = "Confirm Your Email"
-            email_body = render_to_string(
-                'confirm_email.html', {'confirm_link': confirm_link})
+#             confirm_link = f"https://blueskybooking.onrender.com/user/active/{uid}/{token}"
+#             email_subject = "Confirm Your Email"
+#             email_body = render_to_string(
+#                 'confirm_email.html', {'confirm_link': confirm_link})
 
-            email = EmailMultiAlternatives(email_subject, '', to=[user.email])
-            email.attach_alternative(email_body, "text/html")
+#             email = EmailMultiAlternatives(email_subject, '', to=[user.email])
+#             email.attach_alternative(email_body, "text/html")
 
-            email.send()
+#             email.send()
 
-            return Response('Check your email for confirmation')
-        return Response(serializer.errors)
+#             return Response('Check your email for confirmation')
+#         return Response(serializer.errors)
 
 
 # User = get_user_model()
@@ -79,23 +79,6 @@ class UserRegistrationSerializerViewSet(APIView):
 #     else:
 #         return redirect('verified_unsuccess')
 
-
-User = get_user_model()
-from django.utils.encoding import force_str
-def activate(request, uid64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uid64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-
-    if user is not None and default_token_generator.check_token(user, token):
-        if not user.is_active:
-            user.is_active = True
-            user.save()
-        return redirect('verified_success')
-    else:
-        return redirect('verified_unsuccess')
 
 class UserLoginApiView(APIView):
     def post(self, request):
@@ -177,3 +160,56 @@ class AdminMessageViewSet(viewsets.ModelViewSet):
         if user.is_staff or user.is_superuser:
             return AdminMessage.objects.all()
         return AdminMessage.objects.filter(user=user)
+
+
+# -------------------
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib.auth import get_user_model
+from django.shortcuts import render, redirect, get_object_or_404
+
+User = get_user_model()
+
+def activate(request, uid64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uid64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if not user.is_active:
+            user.is_active = True
+            user.save()
+        return redirect('verified_success')
+    else:
+        return redirect('verified_unsuccess')
+
+
+
+
+class UserRegistrationSerializerViewSet(APIView):
+    serializer_class = UserRegistrationSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            print("Uid  : ----------------------- ", uid,  "token : -----------------------", token)
+            confirm_link = f"https://blueskybooking.onrender.com/user/active/{uid}/{token}"
+            print("confirm link is : ----------------------- ", confirm_link)
+            email_subject = "Confirm Your Email"
+            email_body = render_to_string(
+                'confirm_email.html', {'confirm_link': confirm_link})
+
+            email = EmailMultiAlternatives(email_subject, '', to=[user.email])
+            email.attach_alternative(email_body, "text/html")
+
+            email.send()
+
+            return Response('Check your email for confirmation')
+        return Response(serializer.errors)
