@@ -60,25 +60,42 @@ class UserRegistrationSerializerViewSet(APIView):
         return Response(serializer.errors)
 
 
+# User = get_user_model()
+
+
+# def activate(request, uid64, token):
+#     try:
+#         uid = urlsafe_base64_decode(uid64).decode()
+#     except (TypeError, ValueError, UnicodeDecodeError):
+#         return redirect('verified_unsuccess')
+
+#     user = get_object_or_404(User, pk=uid)
+
+#     if default_token_generator.check_token(user, token):
+#         if not user.is_active:
+#             user.is_active = True
+#             user.save()
+#         return redirect('verified_success')
+#     else:
+#         return redirect('verified_unsuccess')
+
+
 User = get_user_model()
-
-
+from django.utils.encoding import force_str
 def activate(request, uid64, token):
     try:
-        uid = urlsafe_base64_decode(uid64).decode()
-    except (TypeError, ValueError, UnicodeDecodeError):
-        return redirect('verified_unsuccess')
+        uid = force_str(urlsafe_base64_decode(uid64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
 
-    user = get_object_or_404(User, pk=uid)
-
-    if default_token_generator.check_token(user, token):
+    if user is not None and default_token_generator.check_token(user, token):
         if not user.is_active:
             user.is_active = True
             user.save()
         return redirect('verified_success')
     else:
         return redirect('verified_unsuccess')
-
 
 class UserLoginApiView(APIView):
     def post(self, request):
