@@ -14,7 +14,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: #f0f2f5;
+            background: linear-gradient(135deg, #f0f2f5, #c0c0c0);
         }
         .container {
             text-align: center;
@@ -46,6 +46,7 @@
             text-decoration: none;
             font-weight: bold;
             transition: background 0.3s;
+            cursor: pointer;
         }
         .btn:hover {
             background: #45a049;
@@ -57,7 +58,17 @@
         <div class="icon">✔️</div>
         <h1>Email Successfully Verified</h1>
         <p>Your email address has been successfully verified. You can now proceed to log in.</p>
-        <a href="#" class="btn">Go to Login</a>
+        <a id="loginLink" class="btn">Go to Login</a>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginLink = document.getElementById('loginLink');
+            loginLink.addEventListener('click', function (event) {
+                event.preventDefault();
+                window.location.href = 'https://bluskybooking.netlify.app/login.html';
+            });
+        });
+    </script>
 </body>
 </html>

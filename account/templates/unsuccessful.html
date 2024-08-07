@@ -14,7 +14,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: #f8d7da;
+            background: linear-gradient(to right, #f8d7da, #ffffff);
         }
         .container {
             text-align: center;
@@ -51,6 +51,7 @@
             font-weight: bold;
             transition: background 0.3s;
             margin: 5px;
+            cursor: pointer;
         }
         .btn:hover {
             background: #c82333;
@@ -68,8 +69,24 @@
         <div class="icon">❌</div>
         <h1>Email Verification Failed</h1>
         <p>Unfortunately, we couldn't verify your email address. Please try again or contact support for assistance.</p>
-        <a href="register.html" class="btn">Try Again</a>
-        <a href="index.html" class="btn secondary">Contact Support</a>
+        <a href="#" id="tryAgain" class="btn">Try Again</a>
+        <a href="#" id="registerAgain" class="btn secondary">Register Again</a>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tryAgainLink = document.getElementById('tryAgain');
+            const registerAgainLink = document.getElementById('registerAgain');
+            
+            tryAgainLink.addEventListener('click', function (event) {
+                event.preventDefault();
+                window.location.href = 'https://bluskybooking.netlify.app/register.html';
+            });
+
+            registerAgainLink.addEventListener('click', function (event) {
+                event.preventDefault();
+                window.location.href = 'https://bluskybooking.netlify.app/register.html';
+            });
+        });
+    </script>
 </body>
 </html>
