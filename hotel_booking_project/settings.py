@@ -132,7 +132,7 @@ WSGI_APPLICATION = 'hotel_booking_project.wsgi.application'
 # render Database
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgresql://school_management_w7ic_user:u36JAeTW27qm3YNA0pydhETmErlsmwlJ@dpg-cr69af52ng1s7395ol60-a.oregon-postgres.render.com/school_management_w7ic"
+        default="postgresql://bluskybooking_2ec8_user:WYZoLPyhnQbG3fbZEdALNS2mBEUEen8P@dpg-crslfo3tq21c73dgkbr0-a.oregon-postgres.render.com/bluskybooking_2ec8"
     )
 }
 
